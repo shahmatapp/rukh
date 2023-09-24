@@ -1,25 +1,25 @@
 import BaseService,{D} from "@/src/services/base";
-import {v4 as uuid} from "uuid";
 import {createContext, Dispatch, ReactNode, useEffect, useReducer} from "react";
 
 interface Move{
-    id:string,
-    san:string,
+    id?:string,
     parent?:string,
-    fen:string
+    fen:string,
+    move: string[],
+    bookId:string
 }
 
 class MoveService extends BaseService{
 
     constructor() {
-        super("Move");
+        super("Moves");
 
     }
 }
 
 const moveService = new MoveService()
 
-const MovesContext = createContext({moves:[], dispatch:(() => undefined) as Dispatch<any>});
+const MovesContext = createContext({moves:[], dispatch:(() => undefined) as Dispatch<D>});
 
 function movesReducer(moves:Move[], action:D) {
 
@@ -28,7 +28,7 @@ function movesReducer(moves:Move[], action:D) {
             return action.data
         }
         case 'add': {
-            let move = {...action.data, id:uuid()}
+            let move = {...action.data}
             moveService.save(move).then(()=>{
                 console.log("Move added");
             });
@@ -43,10 +43,11 @@ function movesReducer(moves:Move[], action:D) {
     }
 }
 
-function MovesProvider({children}: { children:ReactNode }){
+function MovesProvider({children, bookId}: { children:ReactNode, bookId:string }){
     const [moves, dispatch] = useReducer(movesReducer,[] as Move[]);
     useEffect(()=>{
         moveService.getAll().then((data)=>{
+            data = (data as Move[]).filter(d=>d.bookId==bookId);
             dispatch({type:'load',data})
         })
     },[])
@@ -58,5 +59,7 @@ function MovesProvider({children}: { children:ReactNode }){
 }
 
 export {
-    MovesProvider
+    MovesProvider, MovesContext
 }
+
+export type {Move}

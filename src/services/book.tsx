@@ -1,13 +1,12 @@
 import BaseService,{D} from "./base";
 import {createContext, Dispatch, ReactNode, useEffect, useReducer} from 'react';
-import { v4 as uuid } from 'uuid';
 interface Book{
     id:string,
     name:string,
     perspective:string
 }
 
-const BooksContext = createContext({books:[], dispatch:(() => undefined) as Dispatch<any>});
+const BooksContext = createContext({books:[], dispatch:(() => undefined) as Dispatch<D>});
 
 function booksReducer(books:Book[], action:D) {
     
@@ -16,7 +15,7 @@ function booksReducer(books:Book[], action:D) {
             return action.data
         }
         case 'add': {
-            let book = {...action.data, id:uuid(), perspective:'W'}
+            let book = {...action.data}
             BookService.save(book).then(()=>{
                 console.log("Book added");
             });
@@ -47,7 +46,7 @@ function BooksProvider({children}: { children:ReactNode }){
 class BookServiceSingleTon extends BaseService{
 
     constructor() {
-        super("Book");
+        super("Books");
 
     }
 }

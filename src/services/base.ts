@@ -27,7 +27,7 @@ class BaseService{
     getAll(){
         return new Promise(async (resolve,reject)=>{
             let db = await getDB();
-            let tx = db.transaction(this.storeName, 'readonly');
+            let tx = db.transaction([this.storeName], 'readonly');
             let request = tx.objectStore(this.storeName).getAll();
             request.onsuccess = function(_) {
                 resolve(request.result)
@@ -35,7 +35,9 @@ class BaseService{
             request.onerror = function(event) {
                 reject(event)
             };
+            tx.commit();
         })
+
     }
 
 }

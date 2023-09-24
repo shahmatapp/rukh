@@ -2,6 +2,8 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import {useEffect, useState} from "react";
+import {initDB} from "@/src/services/db";
 const inter = Inter({ subsets: ['latin'] });
 
 const theme = createTheme({
@@ -20,12 +22,24 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+
+  const [isReady, setIsReady]= useState(false);
+  useEffect(()=>{
+    initDB().then(()=>{
+      setIsReady(true)
+    })
+  });
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ThemeProvider theme={theme}>
-          {children}
-        </ThemeProvider>
+      { isReady ?
+          <ThemeProvider theme={theme}>
+            {children}
+          </ThemeProvider>
+          :
+          <div>Loading</div>
+      }
       </body>
     </html>
   )

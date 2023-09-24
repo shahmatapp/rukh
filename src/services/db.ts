@@ -1,6 +1,7 @@
 
 const STORES=[
-    {name:"Book", key:"id"}
+    {name:"Books", key:"id"},
+    {name:"Moves", key:"id"}
 ];
 let DB:IDBDatabase;
 

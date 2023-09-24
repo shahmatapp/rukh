@@ -6,7 +6,8 @@ import TextField from "@mui/material/TextField";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
-import {BooksContext, BookService} from "@/src/services/book";
+import {BooksContext} from "@/src/services/book";
+import {v4 as uuid} from "uuid";
 interface Props{
     open:boolean,
     handleClose:any,
@@ -15,7 +16,7 @@ export default function CreateBookModal({open=false, handleClose,}:Props){
     const [bookName,setBookName] = useState("");
     const {dispatch} = useContext(BooksContext);
     let createBook= ()=>{
-        dispatch({type:'add',data:{name:bookName}});
+        dispatch({type:'add',data:{name:bookName,id:uuid(), perspective:'W'}});
         handleClose();
     }
 
