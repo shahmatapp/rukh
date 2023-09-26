@@ -16,7 +16,7 @@ export default function CreateBookModal({open=false, handleClose,}:Props){
     const [bookName,setBookName] = useState("");
     const {dispatch} = useContext(BooksContext);
     let createBook= ()=>{
-        dispatch({type:'add',data:{name:bookName,id:uuid(), perspective:'W'}});
+        dispatch({type:'add',data:{name:bookName,id:uuid(), perspective:'w'}});
         handleClose();
     }
 

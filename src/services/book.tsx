@@ -54,6 +54,6 @@ class BookServiceSingleTon extends BaseService{
 const BookService = new BookServiceSingleTon()
 
 export {
-    BooksProvider, BooksContext
+    BooksProvider, BooksContext, BookService
 };
 export type { Book };

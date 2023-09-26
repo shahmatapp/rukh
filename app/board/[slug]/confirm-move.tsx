@@ -12,9 +12,9 @@ interface Props{
 export default function ConfirmMove({confirmMove}:Props){
     const {dispatch} = useContext(MovesContext);
     const moveOnPage = useContext(PageContext);
-    const {fen, move, bookId, parent} = moveOnPage.move;
+    const {fen, move, bookId, parent, isMe} = moveOnPage.move;
     let save =()=>{
-        let m:Move = {fen, move, bookId, parent, id:uuid()}
+        let m:Move = {fen, move, bookId, parent, isMe, id:uuid()}
         dispatch({type:"add",data:m})
         confirmMove(m);
     }

@@ -1,12 +1,14 @@
 import BaseService,{D} from "@/src/services/base";
 import {createContext, Dispatch, ReactNode, useEffect, useReducer} from "react";
+import {Book} from "@/src/services/book";
 
 interface Move{
     id?:string,
     parent?:string,
     fen:string,
     move: string[],
-    bookId:string
+    bookId:string,
+    isMe:boolean
 }
 
 class MoveService extends BaseService{
@@ -43,14 +45,14 @@ function movesReducer(moves:Move[], action:D) {
     }
 }
 
-function MovesProvider({children, bookId}: { children:ReactNode, bookId:string }){
+function MovesProvider({children, book}: { children:ReactNode, book:Book }){
     const [moves, dispatch] = useReducer(movesReducer,[] as Move[]);
     useEffect(()=>{
         moveService.getAll().then((data)=>{
-            data = (data as Move[]).filter(d=>d.bookId==bookId);
+            data = (data as Move[]).filter(d=>d.bookId==book.id);
             dispatch({type:'load',data})
         })
-    },[])
+    },[book])
     return (
         <MovesContext.Provider value={{moves, dispatch}}>
             {children}

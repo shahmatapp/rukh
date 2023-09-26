@@ -24,6 +24,21 @@ class BaseService{
         tx.commit();
     }
 
+    async get(key:string){
+        return new Promise(async (resolve,reject)=>{
+            let db = await getDB();
+            let tx = db.transaction(this.storeName, 'readwrite');
+            let request =  tx.objectStore(this.storeName).get(key);
+            request.onsuccess = function(_) {
+                resolve(request.result)
+            };
+            request.onerror = function(event) {
+                reject(event)
+            };
+        });
+
+    }
+
     getAll(){
         return new Promise(async (resolve,reject)=>{
             let db = await getDB();
