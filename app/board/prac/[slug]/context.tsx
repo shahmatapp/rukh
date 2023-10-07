@@ -1,10 +1,9 @@
-import { createContext } from 'react';
+import {createContext} from "react";
 import {Move} from "@/src/services/move";
 
 interface Props{
-    move:Move
-    apply?:(move:Move)=>void
-    prepareEditor:()=>void
+    makeMove:()=>void,
+    childMoves:Move[]
 }
 
 const PageContext = createContext({} as Props);

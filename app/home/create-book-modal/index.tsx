@@ -8,6 +8,7 @@ import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import {BooksContext} from "@/src/services/book";
 import {v4 as uuid} from "uuid";
+import Tiptap from "@/app/components/wysiwyg";
 interface Props{
     open:boolean,
     handleClose:any,
@@ -46,6 +47,9 @@ export default function CreateBookModal({open=false, handleClose,}:Props){
                         setBookName(event.target.value);
                     }}
                 />
+
+                <Tiptap/>
+
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>

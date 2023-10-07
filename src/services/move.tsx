@@ -8,7 +8,8 @@ interface Move{
     fen:string,
     move: string[],
     bookId:string,
-    isMe:boolean
+    isMe:boolean,
+    notes?:string,
 }
 
 class MoveService extends BaseService{
@@ -21,7 +22,12 @@ class MoveService extends BaseService{
 
 const moveService = new MoveService()
 
-const MovesContext = createContext({moves:[], dispatch:(() => undefined) as Dispatch<D>});
+interface ContextProps{
+    moves:Move[],
+    book:Book|undefined,
+    dispatch: Dispatch<D>
+}
+const MovesContext = createContext<ContextProps>({moves:[],book:undefined, dispatch:(() => undefined) as Dispatch<D>});
 
 function movesReducer(moves:Move[], action:D) {
 
@@ -29,7 +35,7 @@ function movesReducer(moves:Move[], action:D) {
         case 'load':{
             return action.data
         }
-        case 'add': {
+        case 'upsert': {
             let move = {...action.data}
             moveService.save(move).then(()=>{
                 console.log("Move added");
@@ -54,14 +60,14 @@ function MovesProvider({children, book}: { children:ReactNode, book:Book }){
         })
     },[book])
     return (
-        <MovesContext.Provider value={{moves, dispatch}}>
+        <MovesContext.Provider value={{moves,book, dispatch}}>
             {children}
         </MovesContext.Provider>
     );
 }
 
 export {
-    MovesProvider, MovesContext
+    MovesProvider, MovesContext, moveService
 }
 
 export type {Move}

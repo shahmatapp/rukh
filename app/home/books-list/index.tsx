@@ -14,7 +14,7 @@ export default function BookList(){
                 books.map((b:Book)=>{
                     return (
                         <ListItem key={b.id}>
-                            <ListItemText><Link href={`/board/${b.id}`}>{b.name}</Link></ListItemText>
+                            <ListItemText><Link href={`/board/prac/${b.id}`}>{b.name}</Link></ListItemText>
                         </ListItem>
                     )
                 })

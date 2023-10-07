@@ -6,6 +6,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CreateBookModal from "@/app/home/create-book-modal";
 import { BooksProvider } from '@/src/services/book';
 import BookList from "@/app/home/books-list";
+import {Card, CardContent, CardHeader} from "@mui/material";
 
 
 export default function Home() {
@@ -17,21 +18,27 @@ export default function Home() {
 
     return (
         <BooksProvider>
-            <main className="min-h-screen p-24">
-                <div className="grid grid-cols-4 gap-5">
-                    <div>
-                        <div className="header border-dashed border-0 border-b pb-3">
-                            <span className="p-2 align-bottom mb-2"><SummarizeIcon color="primary" /></span>
-                            <span>Books</span>
-                            <span className="float-right">
+            <main className="min-h-screen sm:p-10 p-2 place-content-center flex">
+                <div className="flex-initial w-96">
+                    <Card variant={"outlined"}>
+                        <CardHeader
+                            title={<div>
+                                <span className="p-2"><SummarizeIcon color="primary" fontSize={"medium"}/></span>
+                                <span className={"align-bottom text-base"}>Books</span>
+                            </div>}
+                            action={
                                 <IconButton aria-label="add-book" onClick={handleOpen}>
                                     <AddIcon/>
                                 </IconButton>
-                            </span>
-                            <CreateBookModal open={open} handleClose={handleClose} />
-                        </div>
-                        <BookList/>
-                    </div>
+                            }
+                        />
+                        <CreateBookModal open={open} handleClose={handleClose} />
+
+                        <CardContent>
+                            <BookList/>
+                        </CardContent>
+
+                    </Card>
                     <div className="col-span-3">
 
                     </div>

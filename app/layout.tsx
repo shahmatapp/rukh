@@ -32,14 +32,14 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
-      { isReady ?
-          <ThemeProvider theme={theme}>
-            {children}
-          </ThemeProvider>
-          :
-          <div>Loading</div>
-      }
+      <body className={inter.className }>
+        { isReady ?
+            <ThemeProvider theme={theme}>
+              {children}
+            </ThemeProvider>
+            :
+            <div>Loading</div>
+        }
       </body>
     </html>
   )
