@@ -128,7 +128,8 @@ cg-board piece.fading {
     top: 0;
     flex-flow: column-reverse;
     height: 100%;
-    width: 12px;
+    width: 15px;
+    padding: 5px;
 }
 .cg-wrap coords.ranks.black {
     flex-flow: column;
@@ -150,4 +151,8 @@ cg-board piece.fading {
 }
 .cg-wrap coords.ranks coord {
     transform: translateY(39%);
+}
+
+coords.files, coords.ranks{
+    background: white;
 }

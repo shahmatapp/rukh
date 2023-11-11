@@ -3,7 +3,7 @@ import {Move, MovesContext} from "@/src/services/move";
 import CorrectMoveFeedback from "@/app/board/prac/[slug]/feedback/correct";
 import InCorrectMoveFeedback from "@/app/board/prac/[slug]/feedback/wrong";
 import PageContext from "@/app/board/prac/[slug]/context";
-import {Alert, Button} from "@mui/material";
+import {Alert, Button, Card, CardActions, CardContent} from "@mui/material";
 
 interface Props{
     parent:undefined|string
@@ -39,12 +39,12 @@ const Feedback = forwardRef(({parent}:Props,ref)=>{
         <>
             {
                 childMoves.length==0 &&
-                <div>
+                <Card>
                     <Alert severity="warning">No more moves in the repertoire !</Alert>
-                    <div>
-                        <Button variant={"outlined"} href={`/board/edit/${book?.id}?p=${parent}`}>Go to editor</Button>
-                    </div>
-                </div>
+                    <CardActions>
+                        <Button size={"small"}  variant={"outlined"} href={`/board/edit/${book?.id}?p=${parent}`}>Go to editor</Button>
+                    </CardActions>
+                </Card>
             }
             {
                 childMoves.length >0 && isCorrectMove && <CorrectMoveFeedback/>

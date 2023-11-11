@@ -20,11 +20,11 @@ export default function Home() {
         <BooksProvider>
             <main className="min-h-screen sm:p-10 p-2 place-content-center flex">
                 <div className="flex-initial w-96">
-                    <Card variant={"outlined"}>
+                    <Card variant={"elevation"}>
                         <CardHeader
                             title={<div>
                                 <span className="p-2"><SummarizeIcon color="primary" fontSize={"medium"}/></span>
-                                <span className={"align-bottom text-base"}>Books</span>
+                                <span className={"align-bottom text-base"}>Repertoire</span>
                             </div>}
                             action={
                                 <IconButton aria-label="add-book" onClick={handleOpen}>
