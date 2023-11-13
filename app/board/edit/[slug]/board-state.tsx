@@ -3,7 +3,7 @@ import {MovesContext, Move} from "@/src/services/move";
 import PageContext from "@/app/board/edit/[slug]/context";
 import Button from '@mui/material/Button';
 import Announce from "@/app/components/ui/announce";
-import Tiptap from "@/app/components/wysiwyg";
+import Tiptap from "@/app/components/wysiwyg/wysiwyg";
 export default function BoardState(){
     const {moves, dispatch} = useContext(MovesContext);
     const {parent, apply, prepareEditor, book, turnColor} = useContext(PageContext);

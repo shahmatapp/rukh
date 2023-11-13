@@ -8,7 +8,7 @@ import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import {BooksContext} from "@/src/services/book";
 import {v4 as uuid} from "uuid";
-import Tiptap from "@/app/components/wysiwyg";
+import Tiptap from "@/app/components/wysiwyg/wysiwyg";
 interface Props{
     open:boolean,
     handleClose:any,
@@ -29,7 +29,7 @@ export default function CreateBookModal({open=false, handleClose,}:Props){
             fullWidth={true}
             maxWidth={"sm"}
         >
-            <DialogTitle>Create a Book</DialogTitle>
+            <DialogTitle>Create a Repertoire</DialogTitle>
             <DialogContent>
                 <DialogContentText>
                     Give a title.
@@ -48,7 +48,7 @@ export default function CreateBookModal({open=false, handleClose,}:Props){
                     }}
                 />
 
-                <Tiptap/>
+                <Tiptap placeholder={"Describe ur Repertoire"}/>
 
             </DialogContent>
             <DialogActions>
