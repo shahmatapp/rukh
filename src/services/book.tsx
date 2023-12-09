@@ -4,6 +4,7 @@ import {moveService, Move} from "@/src/services/move";
 interface Book{
     id:string,
     name:string,
+    description:string,
     perspective:string
 }
 

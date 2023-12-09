@@ -29,7 +29,7 @@ export default function BookList(){
     }
 
     return(
-        <List>
+        <List dense={true}>
             {
                 books.map((b:Book, i)=>{
                     return (
