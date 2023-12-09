@@ -4,15 +4,22 @@ import SummarizeIcon from '@mui/icons-material/Summarize';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import CreateBookModal from "@/app/home/create-book-modal";
-import { BooksProvider } from '@/src/services/book';
+import { BooksProvider, Book } from '@/src/services/book';
 import BookList from "@/app/home/books-list";
 import {Card, CardContent, CardHeader} from "@mui/material";
 
 
 export default function Home() {
     const [open, setOpen] = useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const [modalBook, setModalBook] = useState<null | Book>(null);
+    const handleOpen = (book:null | Book) => {
+        setOpen(true)
+        setModalBook(book);
+    };
+    const handleClose = () => {
+        setOpen(false);
+        setModalBook(null)
+    };
 
 
 
@@ -27,15 +34,15 @@ export default function Home() {
                                 <span className={"align-bottom text-base"}>Repertoire</span>
                             </div>}
                             action={
-                                <IconButton aria-label="add-book" onClick={handleOpen}>
+                                <IconButton aria-label="add-book" onClick={()=>{handleOpen(null)}}>
                                     <AddIcon/>
                                 </IconButton>
                             }
                         />
-                        <CreateBookModal open={open} handleClose={handleClose} />
+                        <CreateBookModal open={open} handleClose={handleClose} book={modalBook}/>
 
                         <CardContent>
-                            <BookList/>
+                            <BookList onEditTitleDesc={handleOpen}/>
                         </CardContent>
 
                     </Card>

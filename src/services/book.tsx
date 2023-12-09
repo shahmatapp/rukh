@@ -16,12 +16,19 @@ function booksReducer(books:Book[], action:D) {
         case 'load':{
             return action.data
         }
-        case 'add': {
+        case 'upsert': {
             let book = {...action.data};
             bookService.save(book).then(()=>{
-                console.log("Book added");
+                console.log("Book saved");
             });
-            return [...books, book];
+            let existing = books.find(b=>b.id==book.id);
+            if(existing){
+                Object.assign(existing, book);
+                return books
+            }else{
+                return [...books, book];
+            }
+
         }
         case 'delete': {
             let book = {...action.data};

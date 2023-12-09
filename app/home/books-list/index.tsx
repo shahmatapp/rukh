@@ -7,8 +7,14 @@ import Link from 'next/link';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {ListItemSecondaryAction, Menu, MenuItem} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
-export default function BookList(){
+import { useRouter } from 'next/navigation'
 
+interface Props{
+    onEditTitleDesc:Function
+}
+
+export default function BookList({onEditTitleDesc}:Props){
+    const router = useRouter();
     const {books, dispatch} = useContext(BooksContext);
     const [anchorEl, setAnchorEl] = useState<null| HTMLElement>(null);
     const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -25,6 +31,16 @@ export default function BookList(){
             return;
         dispatch({type:"delete", data:book});
         handleMenuClose();
+    }
+
+    const editTitleDesc = (book:Book)=>{
+        handleMenuClose();
+        onEditTitleDesc(book);
+    }
+
+    const editBoard = (book:Book)=>{
+        handleMenuClose();
+        router.push(`/board/edit/${book?.id}`);
     }
 
     return(
@@ -45,8 +61,8 @@ export default function BookList(){
                                     open={Boolean(anchorEl)}
                                     onClose={handleMenuClose}
                                 >
-                                    <MenuItem onClick={()=>{}}><span className={"text-sm"}>Edit Title/Description</span></MenuItem>
-                                    <MenuItem onClick={()=>{}}><span className={"text-sm"}>Edit Repertoire</span></MenuItem>
+                                    <MenuItem onClick={()=>{editTitleDesc(b)}}><span className={"text-sm"}>Edit Title/Description</span></MenuItem>
+                                    <MenuItem onClick={()=>{ editBoard(b)}}><span className={"text-sm"}>Edit Repertoire</span></MenuItem>
                                     <MenuItem onClick={()=>{onDelete(b)}}> <span className={"text-red-500 text-sm"}>Delete</span></MenuItem>
                                 </Menu>
                             </ListItemSecondaryAction>
