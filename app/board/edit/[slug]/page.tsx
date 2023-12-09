@@ -2,7 +2,7 @@
 
 import {MovesProvider, moveService, Move} from "@/src/services/move";
 import EditBoard from "@/app/board/edit/[slug]/main";
-import {Book, BookService} from "@/src/services/book";
+import {Book, bookService} from "@/src/services/book";
 import {useEffect, useState} from "react";
 import {useSearchParams} from "next/navigation";
 
@@ -13,7 +13,7 @@ export default function Page({params}:{ params: { slug: string } }) {
     const searchParams = useSearchParams()
     const rootId:string|undefined = searchParams.get("p") || undefined;
     useEffect(()=>{
-        let p =[BookService.get(bookId)];
+        let p =[bookService.get(bookId)];
 
         if(rootId){
             p.push(moveService.get(rootId))

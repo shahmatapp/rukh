@@ -1,5 +1,6 @@
 import BaseService,{D} from "./base";
 import {createContext, Dispatch, ReactNode, useEffect, useReducer} from 'react';
+import {moveService, Move} from "@/src/services/move";
 interface Book{
     id:string,
     name:string,
@@ -16,7 +17,7 @@ function booksReducer(books:Book[], action:D) {
         }
         case 'add': {
             let book = {...action.data}
-            BookService.save(book).then(()=>{
+            bookService.save(book).then(()=>{
                 console.log("Book added");
             });
             return [...books, book];
@@ -33,7 +34,7 @@ function booksReducer(books:Book[], action:D) {
 function BooksProvider({children}: { children:ReactNode }){
     const [books, dispatch] = useReducer(booksReducer,[] as Book[]);
     useEffect(()=>{
-        BookService.getAll().then((data)=>{
+        bookService.getAll().then((data)=>{
             dispatch({type:'load',data})
         })
     },[])
@@ -49,11 +50,22 @@ class BookServiceSingleTon extends BaseService{
         super("Books");
 
     }
+
+    async remove(key: string): Promise<void> {
+        let moves  = await  moveService.getAll();
+        let bookMoves = (moves as  Move[]).filter((m)=>m.bookId==key)
+        for (let move of bookMoves){
+            if(move.id){
+                await moveService.remove(move.id);
+            }
+        }
+        await super.remove(key);
+    }
 }
 
-const BookService = new BookServiceSingleTon()
+const bookService = new BookServiceSingleTon()
 
 export {
-    BooksProvider, BooksContext, BookService
+    BooksProvider, BooksContext, bookService
 };
 export type { Book };
