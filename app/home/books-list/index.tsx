@@ -9,7 +9,7 @@ import {ListItemSecondaryAction, Menu, MenuItem} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 export default function BookList(){
 
-    const {books} = useContext(BooksContext);
+    const {books, dispatch} = useContext(BooksContext);
     const [anchorEl, setAnchorEl] = useState<null| HTMLElement>(null);
     const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -23,9 +23,8 @@ export default function BookList(){
         let c = prompt("Type 'delete' to confirm");
         if(c?.toLowerCase()!="delete")
             return;
-        bookService.remove(book.id).then(()=>{
-            console.log("Repertoire deleted")
-        });
+        dispatch({type:"delete", data:book});
+        handleMenuClose();
     }
 
     return(

@@ -17,14 +17,18 @@ function booksReducer(books:Book[], action:D) {
             return action.data
         }
         case 'add': {
-            let book = {...action.data}
+            let book = {...action.data};
             bookService.save(book).then(()=>{
                 console.log("Book added");
             });
             return [...books, book];
         }
-        case 'deleted': {
-          return books.filter(t => t.id !== action.data.id);
+        case 'delete': {
+            let book = {...action.data};
+            bookService.remove(book.id).then(()=>{
+                console.log("Repertoire deleted")
+            });
+            return books.filter(t => t.id !== book.id);
         }
         default: {
           throw Error('Unknown action: ' + action.type);
