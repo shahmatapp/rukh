@@ -12,11 +12,11 @@ interface RefProps{
 }
 export default function PracticeBoard(){
     const ref = useRef<RefProps>();
-    const {moves} = useContext(MovesContext);
-
+    const {moves, book} = useContext(MovesContext);
     const [parent, setParent] = useState<string|undefined>(undefined)
     const [fen, setFen] = useState(chess.fen())
     const [lastMove, setLastMove] = useState([] as string[]);
+    const [isViewOnly, setViewOnly] = useState(chess.turn() != book?.perspective);
 
     const childMoves:Move[] = moves.filter((m:Move)=>m.parent===parent);
     const turnColor =()=>{
@@ -41,6 +41,7 @@ export default function PracticeBoard(){
         let fen = chess.fen();
         setFen(fen);
         setLastMove(orig && dest ? [orig, dest] :[]);
+        setViewOnly(chess.turn() != book?.perspective);
     }
     const onMove =(orig:string,dest:string)=>{
         let move:ChessMove|null = chess.move({from:orig,to:dest});
@@ -60,6 +61,7 @@ export default function PracticeBoard(){
         }
 
     }
+
 
     let ctx ={
         makeMove:()=>{
@@ -83,8 +85,9 @@ export default function PracticeBoard(){
                         onMove={onMove}
                         fen={fen}
                         lastMove={lastMove}
-                        viewOnly={false}
+                        viewOnly={isViewOnly}
                         coordinates={true}
+
                     />
                 </div>
                 <div className={"flex-initial w-80"}>

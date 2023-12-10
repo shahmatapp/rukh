@@ -3,6 +3,7 @@ import {useContext} from "react";
 import {MovesContext, Move} from "@/src/services/move";
 import {v4 as uuid} from "uuid";
 import PageContext from "@/app/board/edit/[slug]/context";
+import {Card, CardActions, CardContent} from "@mui/material";
 
 interface Props{
     confirmMove:(m:Move)=>void,
@@ -21,9 +22,12 @@ export default function ConfirmMove({confirmMove}:Props){
     }
 
     return (
-        <div>
-            <div className={"mb-2"}><Button >{`${move[0]} → ${move[1]}`}</Button></div>
-            <div>
+        <Card>
+            <CardContent>
+                <div className={"mb-2"}><Button>{`${move[0]} → ${move[1]}`}</Button></div>
+            </CardContent>
+
+            <CardActions>
                 <span className={"mr-2"}>
                     <Button variant="outlined" disableElevation onClick={save} >
                     Save
@@ -36,9 +40,9 @@ export default function ConfirmMove({confirmMove}:Props){
                 </span>
 
 
-            </div>
+            </CardActions>
 
 
-        </div>
+        </Card>
     );
 }

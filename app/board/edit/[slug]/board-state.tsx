@@ -34,40 +34,47 @@ export default function BoardState(){
 
             }
             {   childMoves.length >0 &&
-                <div>
-                    {myTurn && <Announce >Your saved moved</Announce>}
-                    {!myTurn && <Announce >Your opponents  potential moves</Announce>}
-                    <div>
-                        {
-                            childMoves.map(
-                                (c:Move)=>
-                                    <div key={c.id}>
-                                        <Button onClick={()=>{applyMove(c)}}>{`${c.move[0]} → ${c.move[1]}`}</Button>
-                                    </div>
-                            )
-                        }
-                    </div>
-                    {
-                        !myTurn &&
+                <Card>
+                    <CardContent>
+                        {myTurn && <Announce >Your saved moved</Announce>}
+                        {!myTurn && <Announce >Your opponents  potential moves</Announce>}
                         <div>
-                            <Button variant="outlined" onClick={()=>{ prepareEditor();}}>Add More</Button>
+                            {
+                                childMoves.map(
+                                    (c:Move)=>
+                                        <div key={c.id}>
+                                            <Button onClick={()=>{applyMove(c)}}>{`${c.move[0]} → ${c.move[1]}`}</Button>
+                                        </div>
+                                )
+                            }
                         </div>
-                    }
-                </div>
+                    </CardContent>
+                    <CardActions>
+                        {
+                            !myTurn &&
+                            <div>
+                                <Button variant="outlined" onClick={()=>{ prepareEditor();}}>Add More</Button>
+                            </div>
+                        }
+                    </CardActions>
+
+                </Card>
             }
             {   parentMove &&
-                <div className={"inline-block w-96 text-sm mt-4"}>
-                    <div className={"mb-2"}>Add some notes for {`${parentMove.move[0]} → ${parentMove.move[1]}`}</div>
-                    <Tiptap
-                        onBlur={(data)=>{
+                <Card className={"text-sm mt-4"}>
+                    <CardContent>
+                        <div className={"mb-2"}>Add some notes
+                            for {`${parentMove.move[0]} → ${parentMove.move[1]}`}</div>
+                        <Tiptap
+                            onBlur={(data) => {
                                 parentMove.notes = data;
-                                dispatch({type:"upsert", data:parentMove});
+                                dispatch({type: "upsert", data: parentMove});
                             }
-                        }
-                        content={parentMove.notes}
-                    />
-
-                </div>
+                            }
+                            content={parentMove.notes}
+                        />
+                    </CardContent>
+                </Card>
             }
         </>
 

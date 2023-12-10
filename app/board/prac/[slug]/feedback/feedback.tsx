@@ -38,7 +38,7 @@ const Feedback = forwardRef(({parent}:Props,ref)=>{
     return (
         <>
             {
-                !parent  &&
+                !parent  && childMoves.length==0 &&
                 <Card>
                     <Alert severity="warning">No moves in the repertoire !</Alert>
                     <CardActions>
