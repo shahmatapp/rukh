@@ -21,3 +21,7 @@ body {
   color: rgb(var(--foreground-rgb));
 
 }
+
+.MuiButton-root.bg-white{
+  background: white;
+}

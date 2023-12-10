@@ -38,7 +38,16 @@ const Feedback = forwardRef(({parent}:Props,ref)=>{
     return (
         <>
             {
-                childMoves.length==0 &&
+                !parent  &&
+                <Card>
+                    <Alert severity="warning">No moves in the repertoire !</Alert>
+                    <CardActions>
+                        <Button size={"small"}  variant={"outlined"} href={`/board/edit/${book?.id}`}>Go to editor</Button>
+                    </CardActions>
+                </Card>
+            }
+            {
+                parent && childMoves.length==0 &&
                 <Card>
                     <Alert severity="warning">No more moves in the repertoire !</Alert>
                     <CardActions>

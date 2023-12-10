@@ -4,6 +4,7 @@ import PageContext from "@/app/board/edit/[slug]/context";
 import Button from '@mui/material/Button';
 import Announce from "@/app/components/ui/announce";
 import Tiptap from "@/app/components/wysiwyg/wysiwyg";
+import {Card, CardActions, CardContent} from "@mui/material";
 export default function BoardState(){
     const {moves, dispatch} = useContext(MovesContext);
     const {parent, apply, prepareEditor, book, turnColor} = useContext(PageContext);
@@ -22,10 +23,14 @@ export default function BoardState(){
         <>
             {
                 childMoves.length===0 &&
-                    <div>
-                        <div className={"mb-2"}><Announce>We dont see any moves here </Announce></div>
-                        <Button variant="outlined" onClick={()=>{ prepareEditor();}}>Add Move</Button>
-                    </div>
+                    <Card>
+                        <CardContent>
+                            <div className={"mb-2"}><Announce>We dont see any moves here </Announce></div>
+                        </CardContent>
+                        <CardActions>
+                            <Button size={"small"} variant="outlined" onClick={()=>{ prepareEditor();}}>Add Move</Button>
+                        </CardActions>
+                    </Card>
 
             }
             {   childMoves.length >0 &&

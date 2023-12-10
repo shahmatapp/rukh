@@ -11,6 +11,7 @@ import BoardState from "@/app/board/edit/[slug]/board-state";
 import {Book} from "@/src/services/book";
 import Editor from "@/app/board/edit/[slug]/editor";
 import Button from "@mui/material/Button";
+import {Card, CardContent, Stack} from "@mui/material";
 
 export default function EditBoard({book, root}:{book:Book, root:Move|undefined}) {
 
@@ -112,12 +113,17 @@ export default function EditBoard({book, root}:{book:Book, root:Move|undefined})
                             coordinates={true}
                         />
                     </div>
-                    <div className={"flex-initial w-80"} >
-                        {showEditor ? <Editor confirmMove={confirmMove} madeMove={madeMove}/>:<BoardState/>}
-                        <div>
-                            <Button variant={"outlined"} href={"/"} color={"warning"}> Exit </Button>
-                            <Button variant={"outlined"} href={`/board/prac/${book?.id}`} > Practice </Button>
+
+                    <div className={"flex-initial w-80"}>
+                        {showEditor ? <Editor confirmMove={confirmMove} madeMove={madeMove}/> : <BoardState/>}
+
+                        <div className={"mt-2"}>
+                            <Stack direction="row" spacing={2} >
+                                <Button size={"small"} variant={"outlined"} href={"/"} color={"warning"} className={"bg-white"}>Exit</Button>
+                                <Button size={"small"} variant={"outlined"} href={`/board/prac/${book?.id}`} className={"bg-white"}> Practice </Button>
+                            </Stack>
                         </div>
+
                     </div>
                 </main>
         </PageContext.Provider>

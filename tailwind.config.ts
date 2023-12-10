@@ -10,6 +10,7 @@ const config: Config = {
   ],
   theme: {
     colors:{
+      'white':colors.white,
       'red': colors.red,
       'primary':'#082f49',
       'primary-light':'#082f4930'
