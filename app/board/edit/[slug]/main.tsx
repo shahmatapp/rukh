@@ -24,9 +24,11 @@ export default function EditBoard({book, root}:{book:Book, root:Move|undefined})
     const [madeMove, setMadeMove] = useState(false)
 
     useEffect(()=>{
+        // the root is passed from practice . its meant to be the starting point where we append moves
         if(root){
             chess.load(root?.fen);
             setFen(root?.fen);
+            applyMove(root.move[0],root.move[1]);
         }
 
     }, [root])
