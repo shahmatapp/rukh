@@ -11,10 +11,13 @@ interface Props{
 }
 
 export default function ConfirmMove({confirmMove}:Props){
-    const {dispatch} = useContext(MovesContext);
+    const {dispatch, moves} = useContext(MovesContext);
     const ctx = useContext(PageContext);
     // @ts-ignore
     const {fen, move, bookId, parent, isMe} = ctx.unSavedMove ;
+
+    const moveExists = moves.filter((m)=>m.parent===parent).find(m=>m.move[0]===move[0] && m.move[1] === move[1]);
+
     let save =()=>{
         let m:Move = {fen, move, bookId, parent, isMe, id:uuid()}
         dispatch({type:"upsert",data:m})
@@ -28,16 +31,27 @@ export default function ConfirmMove({confirmMove}:Props){
             </CardContent>
 
             <CardActions>
-                <span className={"mr-2"}>
-                    <Button variant="outlined" disableElevation onClick={save} >
-                    Save
-                    </Button>
-                </span>
-                <span>
-                    <Button variant="outlined" color={"warning"} disableElevation onClick={ctx.undoMove}>
-                        Undo
-                    </Button>
-                </span>
+                {!moveExists && <>
+                    <span className={"mr-2"}>
+                        <Button variant="outlined" disableElevation onClick={save}>
+                        Save
+                        </Button>
+                    </span>
+                    <span>
+                        <Button variant="outlined" color={"warning"} disableElevation onClick={ctx.undoMove}>
+                            Undo
+                        </Button>
+                    </span>
+                </>}
+
+                {
+                    moveExists &&
+                    <span >
+                        <Button variant="outlined" disableElevation onClick={()=>confirmMove(moveExists)}>
+                        Continue
+                        </Button>
+                    </span>
+                }
 
 
             </CardActions>
