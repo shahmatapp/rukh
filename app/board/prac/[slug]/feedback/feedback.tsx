@@ -1,6 +1,5 @@
 import {forwardRef, useContext, useImperativeHandle, useState} from "react";
 import {Move, MovesContext} from "@/src/services/move";
-import CorrectMoveFeedback from "@/app/board/prac/[slug]/feedback/correct";
 import InCorrectMoveFeedback from "@/app/board/prac/[slug]/feedback/wrong";
 import PageContext from "@/app/board/prac/[slug]/context";
 import {Alert, Button, Card, CardActions, CardContent} from "@mui/material";
@@ -55,10 +54,6 @@ const Feedback = forwardRef(({parent}:Props,ref)=>{
                     </CardActions>
                 </Card>
             }
-            {
-                childMoves.length >0 && isCorrectMove && <CorrectMoveFeedback/>
-            }
-
             {
                 childMoves.length >0 && isCorrectMove==false && correctMove && <InCorrectMoveFeedback correctMove={correctMove}/>
             }

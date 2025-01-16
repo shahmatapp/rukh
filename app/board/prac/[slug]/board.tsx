@@ -1,4 +1,4 @@
-import {useState, useRef, useContext} from "react";
+import {useState, useRef, useContext, useMemo, useEffect} from "react";
 import ChessBoard from "@/app/components/chessboard";
 import {Chess, Move as ChessMove, SQUARES} from "chess.js";
 import {Move, MovesContext} from "@/src/services/move"
@@ -13,12 +13,17 @@ interface RefProps{
 export default function PracticeBoard(){
     const ref = useRef<RefProps>();
     const {moves, book} = useContext(MovesContext);
-    const [parent, setParent] = useState<string|undefined>(undefined)
+    const [parent, setParent] = useState<Move|undefined>(undefined)
     const [fen, setFen] = useState(chess.fen())
     const [lastMove, setLastMove] = useState([] as string[]);
     const [isViewOnly, setViewOnly] = useState(chess.turn() != book?.perspective);
 
-    const childMoves:Move[] = moves.filter((m:Move)=>m.parent===parent);
+    //const childMoves:Move[] = moves.filter((m:Move)=>m.parent===parent);
+     // Dynamically calculate childMoves based on the latest parent value
+     const childMoves: Move[] = useMemo(() => {
+        return moves.filter((m: Move) => m.parent === parent?.id);
+    }, [parent, moves]); 
+    
     const turnColor =()=>{
         return chess.turn() === "w" ? "white" : "black"
     }
@@ -57,21 +62,30 @@ export default function PracticeBoard(){
                 applyMove(move?.from, move?.to);
             },500)
         }else{
-            setParent((appliedMove as Move).id);
+            setParent(appliedMove as Move);
         }
 
     }
 
+    useEffect(() => {
+       if(parent?.isMe){
+        setTimeout(()=>{
+            makeMove();
+        },1000)
+       }
+    }, [parent]);
+
+    let makeMove = ()=>{
+        let random = Math.floor(Math.random() * childMoves.length );
+        let move = childMoves[random];
+        chess.move({from:move.move[0],to:move.move[1]});
+        applyMove(move.move[0], move.move[1]);
+        setParent(move);
+        ref.current?.undo();
+    }
 
     let ctx ={
-        makeMove:()=>{
-            let random = Math.floor(Math.random() * childMoves.length );
-            let move = childMoves[random];
-            chess.move({from:move.move[0],to:move.move[1]});
-            applyMove(move.move[0], move.move[1]);
-            setParent(move.id);
-            ref.current?.undo();
-        },
+        makeMove,
         childMoves
     }
 
@@ -91,7 +105,7 @@ export default function PracticeBoard(){
                     />
                 </div>
                 <div className={"flex-initial w-80"}>
-                    <Feedback ref={ref} parent={parent}/>
+                    <Feedback ref={ref} parent={parent?.id}/>
                 </div>
             </main>
         </PageContext.Provider>
