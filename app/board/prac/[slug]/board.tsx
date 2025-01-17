@@ -77,11 +77,14 @@ export default function PracticeBoard(){
 
     let makeMove = ()=>{
         let random = Math.floor(Math.random() * childMoves.length );
-        let move = childMoves[random];
-        chess.move({from:move.move[0],to:move.move[1]});
-        applyMove(move.move[0], move.move[1]);
-        setParent(move);
-        ref.current?.undo();
+        if(childMoves){
+            let move = childMoves[random];
+            chess.move({from:move.move[0],to:move.move[1]});
+            applyMove(move.move[0], move.move[1]);
+            setParent(move);
+            ref.current?.undo();
+        }
+        
     }
 
     let ctx ={
