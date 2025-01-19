@@ -76,8 +76,8 @@ export default function PracticeBoard(){
     }, [parent]);
 
     let makeMove = ()=>{
-        let random = Math.floor(Math.random() * childMoves.length );
         if(childMoves){
+            let random = Math.floor(Math.random() * childMoves.length );
             let move = childMoves[random];
             chess.move({from:move.move[0],to:move.move[1]});
             applyMove(move.move[0], move.move[1]);
