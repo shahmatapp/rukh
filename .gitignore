@@ -33,3 +33,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+api/target
+.idea
+.vscode
+ui/node_modules
+ui/.next
+data
