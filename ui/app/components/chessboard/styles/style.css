@@ -154,5 +154,6 @@ cg-board piece.fading {
 }
 
 coords.files, coords.ranks{
-    background: white;
+    background: #082f49;
+    color: white;
 }
