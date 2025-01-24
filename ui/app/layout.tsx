@@ -3,7 +3,7 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {useEffect, useState} from "react";
-import {initDB} from "@/src/services/db";
+import {initAPI} from "@/src/services/db";
 const inter = Inter({ subsets: ['latin'] });
 
 const theme = createTheme({
@@ -25,7 +25,7 @@ export default function RootLayout({
 
   const [isReady, setIsReady]= useState(false);
   useEffect(()=>{
-    initDB().then(()=>{
+    initAPI().then(()=>{
       setIsReady(true)
     })
   });

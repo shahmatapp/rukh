@@ -1,74 +1,86 @@
-use axum::{
-    extract::{Extension, Json, Path},
-    http::StatusCode,
-};
-use serde_json::{from_value, Value};
+use serde_json::{json, Value};
 use sqlx::SqlitePool;
 
 use crate::db::{books, models::Book};
 use crate::handlers::types::{AppState, WsResponse};
+use crate::parse_or_error;
 
 async fn create_book(pool: SqlitePool, payload: Value) -> WsResponse {
-    match from_value::<Book>(payload) {
-        Ok(book) => {
-            if books::create_book(&pool, &book).await.is_ok() {
-                WsResponse::Ok {
-                    data: Value::String("done".into()),
-                }
-            } else {
-                WsResponse::Error {
-                    message: String::from("Couldnt create book"),
-                }
-            }
-        }
-        Err(e) => WsResponse::Error {
-            message: String::from("Couldnt parse payload"),
+    let book = parse_or_error!(payload, Book);
+    match books::create_book(&pool, &book).await {
+        Ok(_) => WsResponse::Ok {
+            data: "done".into(),
+        },
+        Err(_) => WsResponse::Error {
+            message: "Couldn't create book".into(),
         },
     }
 }
 
-async fn list_books(Extension(pool): Extension<SqlitePool>) -> Result<Json<Vec<Book>>, StatusCode> {
-    books::get_books(&pool)
-        .await
-        .map(Json)
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
-}
-
-async fn get_book(
-    Path(id): Path<String>,
-    Extension(pool): Extension<SqlitePool>,
-) -> Result<Json<Book>, StatusCode> {
-    books::get_book(&pool, &id)
-        .await
-        .map(Json)
-        .map_err(|_| StatusCode::NOT_FOUND)
-}
-
-async fn update_book(
-    Extension(pool): Extension<SqlitePool>,
-    Path(id): Path<String>,
-    Json(payload): Json<Book>,
-) -> StatusCode {
-    let mut book = payload;
-    book.id = id; // Use path parameter as the ID
-    if books::update_book(&pool, &book).await.is_ok() {
-        StatusCode::OK
-    } else {
-        StatusCode::INTERNAL_SERVER_ERROR
+async fn list_books(pool: SqlitePool) -> WsResponse {
+    match books::get_books(&pool).await {
+        Ok(book_vec) => WsResponse::Ok {
+            data: json!(book_vec),
+        },
+        Err(_) => WsResponse::Error {
+            message: String::from("Could not list books"),
+        },
     }
 }
 
-async fn delete_book(Path(id): Path<String>, Extension(pool): Extension<SqlitePool>) -> StatusCode {
-    if books::delete_book(&pool, &id).await.is_ok() {
-        StatusCode::NO_CONTENT
-    } else {
-        StatusCode::INTERNAL_SERVER_ERROR
+async fn get_book(pool: SqlitePool, payload: Value) -> WsResponse {
+    // We expect payload to have { "id": "<book-id>" }
+    #[derive(serde::Deserialize)]
+    struct BookId {
+        id: String,
+    }
+    let data = parse_or_error!(payload, BookId);
+    match books::get_book(&pool, &data.id).await {
+        Ok(book) => WsResponse::Ok { data: json!(book) },
+        Err(_) => WsResponse::Error {
+            message: String::from("Could not find book"),
+        },
+    }
+}
+
+async fn update_book(pool: SqlitePool, payload: Value) -> WsResponse {
+    // We expect payload to have { "id": "some-id", "title": "...", "author": "..." }
+    // or it might be a full Book struct
+    let book = parse_or_error!(payload, Book);
+    match books::update_book(&pool, &book).await {
+        Ok(_) => WsResponse::Ok {
+            data: json!("Book updated successfully"),
+        },
+        Err(_) => WsResponse::Error {
+            message: String::from("Failed to update book"),
+        },
+    }
+}
+
+async fn delete_book(pool: SqlitePool, payload: Value) -> WsResponse {
+    #[derive(serde::Deserialize)]
+    struct BookId {
+        id: String,
+    }
+    let data = parse_or_error!(payload, BookId);
+
+    match books::delete_book(&pool, &data.id).await {
+        Ok(_) => WsResponse::Ok {
+            data: json!("Book deleted"),
+        },
+        Err(_) => WsResponse::Error {
+            message: String::from("Failed to delete book"),
+        },
     }
 }
 
 pub async fn process(action: &str, payload: Value, state: AppState) -> WsResponse {
     match action {
-        "create" => create_book(state.db_pool, payload).await,
+        "create" => create_book(state.db_pool.clone(), payload).await,
+        "list" => list_books(state.db_pool.clone()).await,
+        "get" => get_book(state.db_pool.clone(), payload).await,
+        "update" => update_book(state.db_pool.clone(), payload).await,
+        "delete" => delete_book(state.db_pool.clone(), payload).await,
         &_ => WsResponse::Error {
             message: String::from("invalid action for book"),
         },

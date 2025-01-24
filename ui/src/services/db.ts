@@ -4,12 +4,24 @@ const STORES=[
     {name:"Moves", key:"id"}
 ];
 let DB:IDBDatabase;
+let API: WebSocket;
 
-const initDB =()=>{
+const initAPI =()=>{
     return new Promise<IDBDatabase>((resolve,reject)=>{
+
+        const socket = new WebSocket("ws://localhost:8080/ws");
+        socket.onopen = () => {
+            console.log("Connected to Axum WebSocket server.");
+        };
+        socket.onclose = () => {
+            console.log("Disconnected from server.");
+        };
+
         const DB_NAME="RUKH";
         const DB_VERSION = 1;
         const indexDBRequest = window.indexedDB.open(DB_NAME, DB_VERSION);
+
+
 
         indexDBRequest.onerror = (err) => {
             console.log(err);
@@ -40,7 +52,7 @@ const initDB =()=>{
 }
 
 
-export {initDB}
+export {initAPI}
 export default async function getDB(){
     return  DB;
 };

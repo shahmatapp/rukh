@@ -2,14 +2,13 @@ use axum::{
     extract::ws::{Message, WebSocket, WebSocketUpgrade},
     response::IntoResponse,
     routing::get,
-    Extension, Router,
+    Router,
 };
 use dotenvy::dotenv;
 use sqlx::sqlite::{SqlitePoolOptions};
 use std::env;
 use axum::extract::State;
 use tokio::signal;
-use serde::{Deserialize, Serialize};
 use futures::stream::StreamExt;
 use crate::handlers::types::{WsResponse,WsMessage, AppState};
 
@@ -46,7 +45,13 @@ async fn handle_socket(mut socket: WebSocket, state: AppState) {
                 }
             },
         };
+
+        let resp_text = serde_json::to_string(&response).unwrap();
+        if socket.send(Message::Text(resp_text.into())).await.is_err() {
+            break;
+        }
     }
+
 }
 
 #[tokio::main]

@@ -4,7 +4,7 @@ import { Chessground as NativeChessground } from 'chessground';
 import './styles/style.css'
 import './styles/theme.css'
 
-export default class Chessground extends React.Component {
+export default class Chessground extends React.Component<any, any> {
   
   
   board:any;
