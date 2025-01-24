@@ -2,32 +2,39 @@ use axum::{
     extract::{Extension, Json, Path},
     http::StatusCode,
 };
+use serde_json::{from_value, Value};
 use sqlx::SqlitePool;
 
-use crate::db::{models::Book, books};
+use crate::db::{books, models::Book};
+use crate::handlers::types::{AppState, WsResponse};
 
-pub async fn create_book(
-    Extension(pool): Extension<SqlitePool>,
-    Json(payload): Json<Book>
-    ,
-) -> StatusCode {
-    if books::create_book(&pool, &payload).await.is_ok() {
-        StatusCode::CREATED
-    } else {
-        StatusCode::INTERNAL_SERVER_ERROR
+async fn create_book(pool: SqlitePool, payload: Value) -> WsResponse {
+    match from_value::<Book>(payload) {
+        Ok(book) => {
+            if books::create_book(&pool, &book).await.is_ok() {
+                WsResponse::Ok {
+                    data: Value::String("done".into()),
+                }
+            } else {
+                WsResponse::Error {
+                    message: String::from("Couldnt create book"),
+                }
+            }
+        }
+        Err(e) => WsResponse::Error {
+            message: String::from("Couldnt parse payload"),
+        },
     }
 }
 
-pub async fn list_books(
-    Extension(pool): Extension<SqlitePool>,
-) -> Result<Json<Vec<Book>>, StatusCode> {
+async fn list_books(Extension(pool): Extension<SqlitePool>) -> Result<Json<Vec<Book>>, StatusCode> {
     books::get_books(&pool)
         .await
         .map(Json)
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
 }
 
-pub async fn get_book(
+async fn get_book(
     Path(id): Path<String>,
     Extension(pool): Extension<SqlitePool>,
 ) -> Result<Json<Book>, StatusCode> {
@@ -37,10 +44,10 @@ pub async fn get_book(
         .map_err(|_| StatusCode::NOT_FOUND)
 }
 
-pub async fn update_book(
+async fn update_book(
     Extension(pool): Extension<SqlitePool>,
     Path(id): Path<String>,
-    Json(payload): Json<Book>    
+    Json(payload): Json<Book>,
 ) -> StatusCode {
     let mut book = payload;
     book.id = id; // Use path parameter as the ID
@@ -51,10 +58,7 @@ pub async fn update_book(
     }
 }
 
-pub async fn delete_book(
-    Path(id): Path<String>,
-    Extension(pool): Extension<SqlitePool>,
-) -> StatusCode {
+async fn delete_book(Path(id): Path<String>, Extension(pool): Extension<SqlitePool>) -> StatusCode {
     if books::delete_book(&pool, &id).await.is_ok() {
         StatusCode::NO_CONTENT
     } else {
@@ -62,4 +66,11 @@ pub async fn delete_book(
     }
 }
 
-// Add similar handlers for `moves`...
+pub async fn process(action: &str, payload: Value, state: AppState) -> WsResponse {
+    match action {
+        "create" => create_book(state.db_pool, payload).await,
+        &_ => WsResponse::Error {
+            message: String::from("invalid action for book"),
+        },
+    }
+}
