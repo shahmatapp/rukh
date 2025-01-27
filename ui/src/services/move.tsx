@@ -1,6 +1,7 @@
-import BaseService,{D} from "@/src/services/base";
-import {createContext, Dispatch, ReactNode, useEffect, useReducer} from "react";
+import BaseService from "@/src/services/base";
+import {createContext, ReactNode, useEffect, useState} from "react";
 import {Book} from "@/src/services/book";
+import {useWS, WrappedWS} from "@/src/contexts/websockets";
 
 interface Move{
     id?:string,
@@ -14,60 +15,40 @@ interface Move{
 
 class MoveService extends BaseService{
 
-    constructor() {
-        super("Moves");
+    constructor( ws: WrappedWS) {
+        super("move", ws);
 
     }
 }
 
-const moveService = new MoveService()
 
 interface ContextProps{
-    moves:Move[],
     book:Book|undefined,
-    dispatch: Dispatch<D>
+    moveService: MoveService|null
 }
-const MovesContext = createContext<ContextProps>({moves:[],book:undefined, dispatch:(() => undefined) as Dispatch<D>});
+const MovesContext = createContext<ContextProps>({book:undefined, moveService:null});
 
-function movesReducer(moves:Move[], action:D) {
-
-    switch (action.type) {
-        case 'load':{
-            return action.data
-        }
-        case 'upsert': {
-            let move = {...action.data}
-            moveService.save(move).then(()=>{
-                console.log("Move added");
-            });
-            return [...moves, move];
-        }
-        case 'deleted': {
-            return moves.filter(t => t.id !== action.data.id);
-        }
-        default: {
-            throw Error('Unknown action: ' + action.type);
-        }
-    }
-}
 
 function MovesProvider({children, book}: { children:ReactNode, book:Book }){
-    const [moves, dispatch] = useReducer(movesReducer,[] as Move[]);
-    useEffect(()=>{
-        moveService.getAll().then((data)=>{
-            data = (data as Move[]).filter(d=>d.bookId==book.id);
-            dispatch({type:'load',data})
-        })
-    },[book])
+    const ws = useWS();
+
+    const [moveService, setMoveService] = useState<MoveService|null>(null);
+
+    useEffect(() => {
+        if (!ws) return;
+        setMoveService(new MoveService(ws));
+
+    }, [ws]);
+
     return (
-        <MovesContext.Provider value={{moves,book, dispatch}}>
+        <MovesContext.Provider value={{book, moveService}}>
             {children}
         </MovesContext.Provider>
     );
 }
 
 export {
-    MovesProvider, MovesContext, moveService
+    MovesProvider, MovesContext
 }
 
 export type {Move}

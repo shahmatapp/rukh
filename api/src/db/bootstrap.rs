@@ -13,18 +13,18 @@ pub async fn bootstrap_db(pool: &Pool<Sqlite>, db_path: &str) -> Result<(), sqlx
     // Create the required tables
     let query = r#"
         CREATE TABLE IF NOT EXISTS books (
-            id character(36) PRIMARY KEY,
+            id varchar PRIMARY KEY,
             name varchar NOT NULL,
             description TEXT,
             perspective varchar(1) NOT NULL
         );
 
         CREATE TABLE IF NOT EXISTS moves (
-            id character(36) PRIMARY KEY,
-            bookId character(36),
+            id varchar PRIMARY KEY,
+            bookId varchar,
             fen varchar NOT NULL,
             isMe boolean NOT NULL,
-            parent character(36),
+            parent varchar,
             move TEXT Not null
         );
 

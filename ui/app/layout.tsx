@@ -2,8 +2,7 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import {useEffect, useState} from "react";
-import {initAPI} from "@/src/services/db";
+import {WebSocketProvider} from "@/src/contexts/websockets";
 const inter = Inter({ subsets: ['latin'] });
 
 const theme = createTheme({
@@ -23,23 +22,16 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
 
-  const [isReady, setIsReady]= useState(false);
-  useEffect(()=>{
-    initAPI().then(()=>{
-      setIsReady(true)
-    })
-  });
+
 
   return (
     <html lang="en">
       <body className={inter.className +" bg-primary"}>
-        { isReady ?
-            <ThemeProvider theme={theme}>
-              {children}
-            </ThemeProvider>
-            :
-            <div>Loading</div>
-        }
+      <ThemeProvider theme={theme}>
+        <WebSocketProvider>
+          {children}
+        </WebSocketProvider>
+      </ThemeProvider>
       </body>
     </html>
   )

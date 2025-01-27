@@ -6,7 +6,6 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import {Book, BooksContext} from "@/src/services/book";
-import {v4 as uuid} from "uuid";
 import Tiptap from "@/app/components/wysiwyg/wysiwyg";
 import {Checkbox, FormControlLabel, FormGroup} from "@mui/material";
 interface Props{
@@ -23,13 +22,13 @@ export default function CreateBookModal({open=false, handleClose, book}:Props){
 
     const [bookName,setBookName] = useState<string>(book?.name || "");
     const [isPerspectiveWhite, setIsPerspectiveWhite] = useState<boolean>(book?.perspective=='w' || true)
-    const {dispatch} = useContext(BooksContext);
+    const {bookService} = useContext(BooksContext);
     const ref = useRef<RefProps>();
-    let createBook= ()=>{
+    let createBook= async ()=>{
         let description = ref.current?.getHTML();
-        let id = book==null ? uuid() : book.id;
+        let id = book==null ? undefined : book.id;
         let data = {name:bookName,id,description, perspective: isPerspectiveWhite ?'w':'b'}
-        dispatch({type:'upsert',data});
+        await bookService?.save(data);
         handleClose();
     }
 

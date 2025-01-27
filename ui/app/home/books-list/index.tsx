@@ -1,5 +1,5 @@
-import React, {useContext, useState} from "react";
-import {Book, BooksContext, bookService} from "@/src/services/book";
+import React, {useContext, useEffect, useState} from "react";
+import {Book, BooksContext} from "@/src/services/book";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -15,11 +15,23 @@ interface Props{
 
 export default function BookList({onEditTitleDesc}:Props){
     const router = useRouter();
-    const {books, dispatch} = useContext(BooksContext);
+    const {bookService} = useContext(BooksContext);
     const [anchorEl, setAnchorEl] = useState<null| HTMLElement>(null);
+    const [books, setBooks] = useState<Book[]>([])
     const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
+
+    const loadBooks = ()=>{
+        if(bookService){
+            bookService.getAll().then(data=>{
+                setBooks(data as Book[]);
+            })
+        }
+    }
+    useEffect(() => {
+       loadBooks();
+    }, [bookService]);
 
     const handleMenuClose = () => {
         setAnchorEl(null);
@@ -29,7 +41,9 @@ export default function BookList({onEditTitleDesc}:Props){
         let c = prompt("Type 'delete' to confirm");
         if(c?.toLowerCase()!="delete")
             return;
-        dispatch({type:"delete", data:book});
+        bookService?.remove(book.id).then(()=>{
+           loadBooks();
+        });
         handleMenuClose();
     }
 

@@ -22,9 +22,9 @@ async fn ws_handler(State(state): State<AppState>,ws: WebSocketUpgrade) -> impl 
     ws.on_upgrade(move |socket| handle_socket(socket, state))
 }
 
-async fn process_request<'a>(msg: WsMessage<'a>, state: AppState) -> WsResponse {
-    match msg.model {
-        "book" => handlers::books::process(msg.action, msg.payload, state).await,
+async fn process_request<'a>(msg: WsMessage, state: AppState) -> WsResponse {
+    match msg.model.as_str() {
+        "book" => handlers::books::process(msg.correlation_id, msg.action, msg.payload, state).await,
         //"move" => process_user_request(msg.action, msg.payload),
         other => WsResponse::Error {
             message: format!("Unknown model: {}", other),
@@ -35,6 +35,7 @@ async fn process_request<'a>(msg: WsMessage<'a>, state: AppState) -> WsResponse 
 async fn handle_socket(mut socket: WebSocket, state: AppState) {
     // Echo incoming messages back to the client
     while let Some(Ok(Message::Text(msg))) = socket.next().await {
+        println!("recieved request");
         let response:WsResponse = match serde_json::from_str::<WsMessage>(&msg){
             Ok(req) => {
                 process_request(req, state.clone()).await

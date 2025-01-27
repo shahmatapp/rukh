@@ -1,56 +1,54 @@
-import getDB from './db'
-interface D{type:string,data:any}
+import {WrappedWS} from "@/src/contexts/websockets";
+
 
 class BaseService{
-    storeName:string;
-    constructor(storeName:string){
-        this.storeName = storeName;
-
+    model:string;
+    ws: WrappedWS
+    constructor(model:string, ws: WrappedWS ){
+        this.model = model;
+        this.ws= ws;
     }
 
-    async save(row:object){
+    save(row:Record<any, any>){
+        return new Promise((resolve, _)=>{
+            this.ws.send({
+                model:this.model,
+                action: row['id'] ?  "update" :"create",
+                payload: row
+            }, resolve);
+        })
 
-        let db = await getDB();
-        let tx = db.transaction([this.storeName], 'readwrite');
-        let store = tx.objectStore(this.storeName);
-        store.put(row);
-        tx.commit();
+
     }
 
     async remove(key:string){
-        let db = await getDB();
-        let tx = db.transaction(this.storeName, 'readwrite');
-        tx.objectStore(this.storeName).delete(key);
-        tx.commit();
+        return new Promise(async (resolve,_)=>{
+            this.ws.send({
+                model:this.model,
+                action:"delete",
+                payload:{id:key}
+            },resolve);
+        });
     }
 
     async get(key:string){
-        return new Promise(async (resolve,reject)=>{
-            let db = await getDB();
-            let tx = db.transaction(this.storeName, 'readwrite');
-            let request =  tx.objectStore(this.storeName).get(key);
-            request.onsuccess = function(_) {
-                resolve(request.result)
-            };
-            request.onerror = function(event) {
-                reject(event)
-            };
+        return new Promise(async (resolve,_)=>{
+            this.ws.send({
+                model:this.model,
+                action:"get",
+                payload:{id:key}
+            },resolve);
         });
 
     }
 
     getAll(){
-        return new Promise(async (resolve,reject)=>{
-            let db = await getDB();
-            let tx = db.transaction([this.storeName], 'readonly');
-            let request = tx.objectStore(this.storeName).getAll();
-            request.onsuccess = function(_) {
-                resolve(request.result)
-            };
-            request.onerror = function(event) {
-                reject(event)
-            };
-            tx.commit();
+        return new Promise(async (resolve,_)=>{
+            this.ws.send({
+                model:this.model,
+                action:"list",
+                payload:{}
+            },resolve);
         })
 
     }
@@ -60,4 +58,3 @@ class BaseService{
 
 export default BaseService;
 
-export type {D}

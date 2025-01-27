@@ -1,6 +1,16 @@
-import BaseService,{D} from "./base";
-import {createContext, Dispatch, ReactNode, useEffect, useReducer} from 'react';
-import {moveService, Move} from "@/src/services/move";
+import BaseService from "./base";
+import {createContext, ReactNode, useEffect, useState} from 'react';
+import {WrappedWS, useWS} from "@/src/contexts/websockets";
+
+class BookService extends BaseService{
+
+    constructor(ws: WrappedWS) {
+        super("book", ws);
+
+    }
+
+}
+
 interface Book{
     id:string,
     name:string,
@@ -8,76 +18,35 @@ interface Book{
     perspective:string
 }
 
-const BooksContext = createContext({books:[], dispatch:(() => undefined) as Dispatch<D>});
-
-function booksReducer(books:Book[], action:D) {
-    
-    switch (action.type) {
-        case 'load':{
-            return action.data
-        }
-        case 'upsert': {
-            let book = {...action.data};
-            bookService.save(book).then(()=>{
-                console.log("Book saved");
-            });
-            let existing = books.find(b=>b.id==book.id);
-            if(existing){
-                Object.assign(existing, book);
-                return books
-            }else{
-                return [...books, book];
-            }
-
-        }
-        case 'delete': {
-            let book = {...action.data};
-            bookService.remove(book.id).then(()=>{
-                console.log("Repertoire deleted")
-            });
-            return books.filter(t => t.id !== book.id);
-        }
-        default: {
-          throw Error('Unknown action: ' + action.type);
-        }
-      }
+interface ContextProps{
+    bookService: BookService | null
 }
+const BooksContext = createContext<ContextProps>({bookService: null });
+
+
 
 function BooksProvider({children}: { children:ReactNode }){
-    const [books, dispatch] = useReducer(booksReducer,[] as Book[]);
-    useEffect(()=>{
-        bookService.getAll().then((data)=>{
-            dispatch({type:'load',data})
-        })
-    },[])
+    const ws = useWS();
+
+
+    const [bookService, setBookService] = useState<BookService|null>(null);
+
+    useEffect(() => {
+        if (!ws) return;
+        setBookService(new BookService(ws));
+
+    }, [ws]);
+
+
+
     return (
-        <BooksContext.Provider value={{books, dispatch}}>
+        <BooksContext.Provider value={{bookService}}>
             {children}
         </BooksContext.Provider>
     );
 }
-class BookServiceSingleTon extends BaseService{
-
-    constructor() {
-        super("Books");
-
-    }
-
-    async remove(key: string): Promise<void> {
-        let moves  = await  moveService.getAll();
-        let bookMoves = (moves as  Move[]).filter((m)=>m.bookId==key)
-        for (let move of bookMoves){
-            if(move.id){
-                await moveService.remove(move.id);
-            }
-        }
-        await super.remove(key);
-    }
-}
-
-const bookService = new BookServiceSingleTon()
 
 export {
-    BooksProvider, BooksContext, bookService
+    BooksProvider, BooksContext, BookService
 };
 export type { Book };

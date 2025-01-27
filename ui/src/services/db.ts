@@ -1,59 +1,42 @@
+import EventEmitter from "./event-emitter";
+import { v4 as uuidv4 } from 'uuid';
 
-const STORES=[
-    {name:"Books", key:"id"},
-    {name:"Moves", key:"id"}
-];
-let DB:IDBDatabase;
-let API: WebSocket;
+let WS: WebSocket;
+let eventEmitter = new EventEmitter();
 
 const initAPI =()=>{
-    return new Promise<IDBDatabase>((resolve,reject)=>{
-
-        const socket = new WebSocket("ws://localhost:8080/ws");
-        socket.onopen = () => {
-            console.log("Connected to Axum WebSocket server.");
-        };
-        socket.onclose = () => {
-            console.log("Disconnected from server.");
-        };
-
-        const DB_NAME="RUKH";
-        const DB_VERSION = 1;
-        const indexDBRequest = window.indexedDB.open(DB_NAME, DB_VERSION);
-
-
-
-        indexDBRequest.onerror = (err) => {
-            console.log(err);
-            reject(err)
-        }
-        indexDBRequest.onsuccess = function() {
-            // if another db does a db upgrade , notify this tab
-            DB = indexDBRequest.result;
-            DB.onversionchange = event => {
-                DB.close();
-                alert("A new version of this page is ready. Please reload or close this tab!");
+    return new Promise((resolve,_)=>{
+        if(WS){
+            WS = new WebSocket("ws://localhost:8080/ws");
+            WS.onopen = () => {
+                console.log("Connected to Axum WebSocket server.");
+                resolve("ok");
             };
-            resolve(DB);
-        };
+            WS.onclose = () => {
+                console.log("Disconnected from server.");
+            };
 
-        indexDBRequest.onupgradeneeded = function(event) {
-            console.log('Upgrading DB .. ')
-            let db = indexDBRequest.result;
-            STORES.forEach((store)=>{
-                if (!db.objectStoreNames.contains(store.name)) { // if there's no store
-                    console.log(`Creating ${store.name}`)
-                    db.createObjectStore(store.name, {keyPath: store.key}); // create it
-                }
-            })
-        };
+            WS.onmessage = (event) => {
+                console.log("got response");
+                const {Ok:{data, correlation_id}} = JSON.parse(event.data);
+                eventEmitter.emit(correlation_id, data);
+            };
+        }
+
+
     })
 
 }
 
+const getWS = ()=>({
+  send:(payload:{model:string,action:string, payload:Record<any,any>}, callback:Function)=>{
+      let correlation_id = uuidv4();
+      WS.send(JSON.stringify({...payload, correlation_id}));
+      eventEmitter.subscribe(correlation_id, callback);
+  }
+});
 
-export {initAPI}
-export default async function getDB(){
-    return  DB;
-};
+export {initAPI, getWS}
+
+
 

@@ -3,19 +3,20 @@ use serde_json::Value;
 use sqlx::SqlitePool;
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct WsMessage<'a>{
-    pub(crate) model: &'a str,
-    pub(crate) action: &'a str,
-    pub(crate) payload: Value
+pub struct WsMessage{
+    pub correlation_id: String,
+    pub model: String,
+    pub action: String,
+    pub payload: Value
 }
 
 #[derive(Debug, serde::Serialize)]
-pub(crate) enum WsResponse {
-    Ok { data: Value },
+pub enum WsResponse {
+    Ok { correlation_id : String, data: Value },
     Error { message: String },
 }
 
 #[derive(Clone)]
-pub(crate) struct AppState {
-    pub(crate) db_pool: SqlitePool,
+pub struct AppState {
+    pub db_pool: SqlitePool,
 }

@@ -7,7 +7,7 @@ pub async fn create_book(pool: &Pool<Sqlite>, book: &Book) -> Result<(), sqlx::E
         INSERT INTO books (id, name, description, perspective)
         VALUES (?, ?, ?, ?)
         "#)
-        .bind(&book.id)
+        .bind(&book.id.to_string())
         .bind(&book.name)
         .bind(&book.description)
         .bind(&book.perspective)
@@ -31,20 +31,20 @@ pub async fn get_book(pool: &Pool<Sqlite>, id: &str) -> Result<Book, sqlx::Error
         r#"
         SELECT id, name, description, perspective FROM books WHERE id = ?
         "#)
-    .bind(id)    
+    .bind(id.to_string())
     .fetch_one(pool)
     .await
 }
 
 pub async fn update_book(pool: &Pool<Sqlite>, book: &Book) -> Result<(), sqlx::Error> {
+    let id_str = book.id.to_string();
     sqlx::query!(
         r#"
-        UPDATE books SET name = ?, description = ?, perspective = ? WHERE id = ?
+        UPDATE books SET name = ?, description = ? WHERE id = ?
         "#,
         book.name,
         book.description,
-        book.perspective,
-        book.id
+        id_str
     )
     .execute(pool)
     .await?;
