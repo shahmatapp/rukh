@@ -11,14 +11,15 @@ import {Checkbox, FormControlLabel, FormGroup} from "@mui/material";
 interface Props{
     open:boolean,
     handleClose:any,
-    book: null|Book
+    book: null|Book,
+    onUpsertBook: Function
 }
 
 interface RefProps{
     getHTML:()=>string
 }
 
-export default function CreateBookModal({open=false, handleClose, book}:Props){
+export default function CreateBookModal({open=false, handleClose, book, onUpsertBook}:Props){
 
     const [bookName,setBookName] = useState<string>(book?.name || "");
     const [isPerspectiveWhite, setIsPerspectiveWhite] = useState<boolean>(book?.perspective=='w' || true)
@@ -30,6 +31,7 @@ export default function CreateBookModal({open=false, handleClose, book}:Props){
         let data = {name:bookName,id,description, perspective: isPerspectiveWhite ?'w':'b'}
         await bookService?.save(data);
         handleClose();
+        onUpsertBook();
     }
 
     return (
