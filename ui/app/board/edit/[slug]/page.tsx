@@ -1,39 +1,39 @@
 "use client"; // This is a client component 👈🏽
 
-import {MovesProvider, moveService, Move} from "@/src/services/move";
+import {MovesProvider} from "@/src/services/move";
 import EditBoard from "@/app/board/edit/[slug]/main";
-import {Book, bookService} from "@/src/services/book";
-import {useEffect, useState} from "react";
-import {useSearchParams} from "next/navigation";
+import {Book, BooksContext, BooksProvider} from "@/src/services/book";
+import {useContext, useEffect, useState} from "react";
 
-export default function Page({params}:{ params: { slug: string } }) {
+function PageComponent({bookId}:{bookId:string}) {
     const [book, setBook] = useState<Book>();
-    const [root, setRoot] = useState<Move>();
-    const bookId = params.slug;
-    const searchParams = useSearchParams()
-    const rootId:string|undefined = searchParams.get("p") || undefined;
+    const {bookService} = useContext(BooksContext);
+
     useEffect(()=>{
-        let p =[bookService.get(bookId)];
-
-        if(rootId){
-            p.push(moveService.get(rootId))
+        if(bookService){
+            bookService.get(bookId).then((book)=>{
+                setBook(book as Book);
+            });
         }
-        Promise.all(p).then(([book,root])=>{
-            setBook(book as Book);
-            setRoot(root as Move);
-        })
-
-    },[bookId, rootId])
+    },[bookId, bookService])
 
     return (
         <>
         {book  ?
             <MovesProvider book={book as Book}>
-                <EditBoard book={book as Book} root={root}/>
+                <EditBoard/>
             </MovesProvider>
             :
             <div>Loading</div>
         }
         </>
     )
+}
+
+export default function Page({params}:{ params: { slug: string } }){
+    return (
+        <BooksProvider>
+            <PageComponent bookId={params.slug}/>
+        </BooksProvider>
+    );
 }

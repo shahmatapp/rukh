@@ -1,6 +1,6 @@
 import Button from "@mui/material/Button";
 import {useContext} from "react";
-import {MovesContext, Move} from "@/src/services/move";
+import {Move} from "@/src/services/move";
 import {v4 as uuid} from "uuid";
 import PageContext from "@/app/board/edit/[slug]/context";
 import {Card, CardActions, CardContent} from "@mui/material";
@@ -11,16 +11,14 @@ interface Props{
 }
 
 export default function ConfirmMove({confirmMove}:Props){
-    const {dispatch, moves} = useContext(MovesContext);
     const ctx = useContext(PageContext);
     // @ts-ignore
-    const {fen, move, bookId, parent, isMe} = ctx.unSavedMove ;
+    const { unSavedMove:{fen, move, bookId, parent, isMe}, childMoves} = ctx ;
 
-    const moveExists = moves.filter((m)=>m.parent===parent).find(m=>m.move[0]===move[0] && m.move[1] === move[1]);
+    const moveExists = childMoves.find(m=>m.move[0]===move[0] && m.move[1] === move[1]);
 
     let save =()=>{
         let m:Move = {fen, move, bookId, parent, isMe, id:uuid()}
-        dispatch({type:"upsert",data:m})
         confirmMove(m);
     }
 

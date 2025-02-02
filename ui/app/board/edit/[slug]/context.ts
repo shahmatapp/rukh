@@ -6,10 +6,11 @@ interface Props{
     unSavedMove:Move|null,
     turnColor:string,
     book:Book,
-    parent:string|undefined,
+    parentMove: Move | undefined,
     apply?:(move:Move)=>void,
     undoMove:()=>void,
-    prepareEditor:()=>void
+    prepareEditor:()=>void,
+    childMoves:Move[]
 }
 
 const PageContext = createContext({} as Props);

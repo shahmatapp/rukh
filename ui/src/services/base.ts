@@ -42,15 +42,14 @@ class BaseService{
 
     }
 
-    getAll(){
+    query(payload={}){
         return new Promise(async (resolve,_)=>{
             this.ws.send({
                 model:this.model,
                 action:"list",
-                payload:{}
+                payload
             },resolve);
         })
-
     }
 
 }

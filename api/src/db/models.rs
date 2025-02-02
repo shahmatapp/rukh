@@ -36,5 +36,11 @@ pub struct Move {
     pub fen: String,
     pub is_me: bool,
     pub parent: Option<String>,
-    pub move_: String,
+    pub mov: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct QueryMove{
+    pub book_id: Option<String>,
+    pub parent: Option<String>
 }

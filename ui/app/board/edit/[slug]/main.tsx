@@ -2,36 +2,60 @@
 
 import ChessBoard from "../../../components/chessboard";
 import {Chess,SQUARES} from "chess.js";
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 let chess = new Chess();
-import {Move} from "@/src/services/move";
+import {Move, MovesContext} from "@/src/services/move";
 
 import PageContext from "@/app/board/edit/[slug]/context";
 import BoardState from "@/app/board/edit/[slug]/board-state";
-import {Book} from "@/src/services/book";
 import Editor from "@/app/board/edit/[slug]/editor";
 import Button from "@mui/material/Button";
-import {Card, CardContent, Stack} from "@mui/material";
+import {useSearchParams} from "next/navigation";
+import {Stack} from "@mui/material";
 
-export default function EditBoard({book, root}:{book:Book, root:Move|undefined}) {
+
+export default function EditBoard() {
+    const searchParams = useSearchParams()
+    const rootId:string|undefined = searchParams.get("p") || undefined;
 
     const [fen, setFen] = useState(chess.fen())
     const [lastMove, setLastMove] = useState([] as string[]);
-    const [parent, setParent] = useState<string|undefined>(root ? root.id:undefined)
+    const [parent, setParent] = useState<string|undefined>(rootId)
+    const [parentMove, setParentMove] = useState<Move|undefined>()
     const [isEditable, setIsEditable] = useState(false);
     const [showEditor, setShowEditor] = useState(false);
     const [unSavedMove, setUnSavedMove] = useState<Move|null>(null);
     const [madeMove, setMadeMove] = useState(false)
+    const {moveService, book} = useContext(MovesContext);
+    const [childMoves, setChildMoves] = useState<Move[]>([]);
+
+    if (!book) {
+        throw new Error("Book is undefined, but it should never be on this page.");
+    }
 
     useEffect(()=>{
         // the root is passed from practice . its meant to be the starting point where we append moves
-        if(root){
-            chess.load(root?.fen);
-            setFen(root?.fen);
-            applyMove(root.move[0],root.move[1]);
+        if(moveService && parent){
+            moveService.get(parent).then((data)=>{
+                let root = data as Move;
+                chess.load(root?.fen);
+                setFen(root?.fen);
+                applyMove(root.move[0],root.move[1]);
+                setParentMove(root)
+            })
+
         }
 
-    }, [root])
+    }, [parent, moveService]);
+
+    useEffect(() => {
+        if(moveService){
+            moveService.query({bookId: book.id, parent}).then((data)=>{
+                setChildMoves(data as Move[]);
+            })
+        }
+    }, [parent, moveService]);
+
     let calcMovable = ()=>{
         const dests = new Map();
 
@@ -86,7 +110,6 @@ export default function EditBoard({book, root}:{book:Book, root:Move|undefined})
     }
 
     let ctx ={
-        parent,
         unSavedMove,
         turnColor:chess.turn(),
         book,
@@ -98,7 +121,9 @@ export default function EditBoard({book, root}:{book:Book, root:Move|undefined})
         prepareEditor:()=>{
             setIsEditable(true);
             setShowEditor(true);
-        }
+        },
+        childMoves,
+        parentMove
     }
 
     return (

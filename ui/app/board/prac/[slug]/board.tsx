@@ -12,18 +12,21 @@ interface RefProps{
 }
 export default function PracticeBoard(){
     const ref = useRef<RefProps>();
-    const {moves, book} = useContext(MovesContext);
+    const {moveService, book} = useContext(MovesContext);
     const [parent, setParent] = useState<Move|undefined>(undefined)
     const [fen, setFen] = useState(chess.fen())
     const [lastMove, setLastMove] = useState([] as string[]);
     const [isViewOnly, setViewOnly] = useState(chess.turn() != book?.perspective);
+    const [childMoves, setChildMoves] = useState<Move[]>([]);
 
-    //const childMoves:Move[] = moves.filter((m:Move)=>m.parent===parent);
-     // Dynamically calculate childMoves based on the latest parent value
-     const childMoves: Move[] = useMemo(() => {
-        return moves.filter((m: Move) => m.parent === parent?.id);
-    }, [parent, moves]); 
-    
+    useEffect(() => {
+        if(book){
+            moveService?.query({book_id :book.id, parent }).then((data)=>{
+                setChildMoves(data as Move[]);
+            })
+        }
+    }, [parent, book]);
+
     const turnColor =()=>{
         return chess.turn() === "w" ? "white" : "black"
     }

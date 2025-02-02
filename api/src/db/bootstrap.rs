@@ -25,7 +25,7 @@ pub async fn bootstrap_db(pool: &Pool<Sqlite>, db_path: &str) -> Result<(), sqlx
             fen varchar NOT NULL,
             isMe boolean NOT NULL,
             parent varchar,
-            move TEXT Not null
+            mov TEXT Not null
         );
 
     "#;

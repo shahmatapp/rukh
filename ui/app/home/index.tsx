@@ -32,7 +32,7 @@ const HomeComponent = ()=>{
 
     const loadBooks = ()=>{
         if(bookService){
-            bookService.getAll().then(data=>{
+            bookService.query().then(data=>{
                 setBooks(data as Book[]);
             })
         }
