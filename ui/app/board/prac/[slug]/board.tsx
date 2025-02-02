@@ -71,7 +71,7 @@ export default function PracticeBoard(){
     }
 
     useEffect(() => {
-       if(parent?.isMe){
+       if(parent?.is_me){
         setTimeout(()=>{
             makeMove();
         },1000)
@@ -82,8 +82,8 @@ export default function PracticeBoard(){
         if(childMoves){
             let random = Math.floor(Math.random() * childMoves.length );
             let move = childMoves[random];
-            chess.move({from:move.move[0],to:move.move[1]});
-            applyMove(move.move[0], move.move[1]);
+            chess.move({from:move.mov[0],to:move.mov[1]});
+            applyMove(move.mov[0], move.mov[1]);
             setParent(move);
             ref.current?.undo();
         }

@@ -40,7 +40,7 @@ export default function EditBoard() {
                 let root = data as Move;
                 chess.load(root?.fen);
                 setFen(root?.fen);
-                applyMove(root.move[0],root.move[1]);
+                applyMove(root.mov[0],root.mov[1]);
                 setParentMove(root)
             })
 
@@ -50,7 +50,7 @@ export default function EditBoard() {
 
     useEffect(() => {
         if(moveService){
-            moveService.query({bookId: book.id, parent}).then((data)=>{
+            moveService.query({book_id: book.id, parent}).then((data)=>{
                 setChildMoves(data as Move[]);
             })
         }
@@ -75,7 +75,7 @@ export default function EditBoard() {
     }
     let onMove=(orig:string,dest:string)=>{
         applyMove(orig, dest);
-        setUnSavedMove({fen,move:[orig,dest],bookId:book.id, parent, isMe: chess.turn()!==book.perspective})
+        setUnSavedMove({fen,mov:[orig,dest],book_id:book.id, parent, is_me: chess.turn()!==book.perspective})
 
     }
 
@@ -114,7 +114,7 @@ export default function EditBoard() {
         turnColor:chess.turn(),
         book,
         apply:(move:Move)=>{
-            applyMove(move.move[0], move.move[1]);
+            applyMove(move.mov[0], move.mov[1]);
             setParent(move.id);
         },
         undoMove,

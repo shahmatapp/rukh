@@ -1,6 +1,6 @@
 import Button from "@mui/material/Button";
 import {useContext} from "react";
-import {Move} from "@/src/services/move";
+import {Move, MovesContext} from "@/src/services/move";
 import {v4 as uuid} from "uuid";
 import PageContext from "@/app/board/edit/[slug]/context";
 import {Card, CardActions, CardContent} from "@mui/material";
@@ -12,20 +12,22 @@ interface Props{
 
 export default function ConfirmMove({confirmMove}:Props){
     const ctx = useContext(PageContext);
+    const {moveService} = useContext(MovesContext);
     // @ts-ignore
-    const { unSavedMove:{fen, move, bookId, parent, isMe}, childMoves} = ctx ;
+    const { unSavedMove:{fen, mov, book_id, parent, is_me}, childMoves} = ctx ;
 
-    const moveExists = childMoves.find(m=>m.move[0]===move[0] && m.move[1] === move[1]);
+    const moveExists = childMoves.find(m=>m.mov[0]===mov[0] && m.mov[1] === mov[1]);
 
     let save =()=>{
-        let m:Move = {fen, move, bookId, parent, isMe, id:uuid()}
+        let m:Move = {fen, mov, book_id, parent, is_me, id:uuid()}
+        moveService?.save(m).then(_=>console.log("move saved"));
         confirmMove(m);
     }
 
     return (
         <Card>
             <CardContent>
-                <div className={"mb-2"}><Button>{`${move[0]} → ${move[1]}`}</Button></div>
+                <div className={"mb-2"}><Button>{`${mov[0]} → ${mov[1]}`}</Button></div>
             </CardContent>
 
             <CardActions>

@@ -5,17 +5,17 @@ import EditBoard from "@/app/board/edit/[slug]/main";
 import {Book, BooksContext, BooksProvider} from "@/src/services/book";
 import {useContext, useEffect, useState} from "react";
 
-function PageComponent({bookId}:{bookId:string}) {
+function PageComponent({book_id}:{book_id:string}) {
     const [book, setBook] = useState<Book>();
     const {bookService} = useContext(BooksContext);
 
     useEffect(()=>{
         if(bookService){
-            bookService.get(bookId).then((book)=>{
+            bookService.get(book_id).then((book)=>{
                 setBook(book as Book);
             });
         }
-    },[bookId, bookService])
+    },[book_id, bookService])
 
     return (
         <>
@@ -33,7 +33,7 @@ function PageComponent({bookId}:{bookId:string}) {
 export default function Page({params}:{ params: { slug: string } }){
     return (
         <BooksProvider>
-            <PageComponent bookId={params.slug}/>
+            <PageComponent book_id={params.slug}/>
         </BooksProvider>
     );
 }

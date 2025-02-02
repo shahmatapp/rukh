@@ -40,7 +40,7 @@ export default function BoardState(){
                                 childMoves.map(
                                     (c:Move)=>
                                         <div key={c.id}>
-                                            <Button onClick={()=>{applyMove(c)}}>{`${c.move[0]} → ${c.move[1]}`}</Button>
+                                            <Button onClick={()=>{applyMove(c)}}>{`${c.mov[0]} → ${c.mov[1]}`}</Button>
                                         </div>
                                 )
                             }
@@ -61,7 +61,7 @@ export default function BoardState(){
                 <Card className={"text-sm mt-4"}>
                     <CardContent>
                         <div className={"mb-2"}>Add some notes
-                            for {`${parentMove.move[0]} → ${parentMove.move[1]}`}</div>
+                            for {`${parentMove.mov[0]} → ${parentMove.mov[1]}`}</div>
                         <Tiptap
                             onBlur={
                                 (data) => {

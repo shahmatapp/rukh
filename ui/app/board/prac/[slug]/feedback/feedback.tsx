@@ -21,7 +21,7 @@ const Feedback = forwardRef(({parent}:Props,ref)=>{
                 throw "should have found a move"
             }
             setCorrectMove(move);
-            if(move.move[0] == orig && move.move[1]==dest){
+            if(move.mov[0] == orig && move.mov[1]==dest){
                 setIsCorrectMove(true);
                 return move;
             }

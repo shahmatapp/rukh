@@ -5,13 +5,13 @@ import {Book, BooksContext, BooksProvider} from "@/src/services/book";
 import {MovesProvider} from "@/src/services/move";
 import PracticeBoard from "@/app/board/prac/[slug]/board";
 
-const  PracticeComponent = ({bookId}:{bookId:string})=>{
+const  PracticeComponent = ({book_id}:{book_id:string})=>{
     const [book, setBook] = useState<Book>()
     const {bookService} = useContext(BooksContext);
 
     const loadBook = ()=>{
         if(bookService){
-            bookService.get(bookId).then((b)=>{
+            bookService.get(book_id).then((b)=>{
                 setBook(b as Book);
             });
         }
@@ -38,7 +38,7 @@ const  PracticeComponent = ({bookId}:{bookId:string})=>{
 export default function Practice({params}:{ params: { slug: string } }){
     return (
         <BooksProvider>
-            <PracticeComponent bookId={params.slug} />
+            <PracticeComponent book_id={params.slug} />
         </BooksProvider>
     );
 }

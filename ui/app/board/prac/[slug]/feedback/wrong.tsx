@@ -16,7 +16,7 @@ export default function InCorrectMoveFeedback({correctMove}:Props){
                 <div> <Button onClick={()=>{setShowCorrectMove(true);}}>Click</Button> <span>to see the right move </span> </div>
                 {
                     showCorrectMove &&
-                    <Button >{`${correctMove.move[0]} → ${correctMove.move[1]}`}</Button>
+                    <Button >{`${correctMove.mov[0]} → ${correctMove.mov[1]}`}</Button>
                 }
             </CardContent>
 

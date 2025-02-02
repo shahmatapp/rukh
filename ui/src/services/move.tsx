@@ -7,9 +7,9 @@ interface Move{
     id?:string,
     parent?:string,
     fen:string,
-    move: string[],
-    bookId:string,
-    isMe:boolean,
+    mov: string[],
+    book_id:string,
+    is_me:boolean,
     notes?:string,
 }
 
