@@ -15,7 +15,7 @@ const WebSocketContext = createContext<WrappedWS | null>(null);
 let eventEmitter = new EventEmitter();
 
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
-    const [ws, setWs] = useState<WrappedWS | null>(null);
+    const [ws] = useState<WrappedWS | null>(null);
     const [socket, setSocket] = useState<WebSocket | null>(null);
     const [wrappedWS, setWrappedWS] = useState<WrappedWS | null>(null);
 
