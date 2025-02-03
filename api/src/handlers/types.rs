@@ -1,6 +1,6 @@
+use sea_orm::DatabaseConnection;
 use serde::Deserialize;
 use serde_json::Value;
-use sqlx::SqlitePool;
 
 #[derive(Debug, Deserialize)]
 pub struct WsMessage{
@@ -18,5 +18,5 @@ pub enum WsResponse {
 
 #[derive(Clone)]
 pub struct AppState {
-    pub db_pool: SqlitePool,
+    pub conn: DatabaseConnection,
 }

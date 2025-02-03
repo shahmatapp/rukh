@@ -31,9 +31,15 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
             };
 
             socket.onmessage = (event) => {
-                console.log("got response");
-                const {Ok:{data, correlation_id}} = JSON.parse(event.data);
-                eventEmitter.emit(correlation_id, data);
+                let response = JSON.parse(event.data);
+                if(response["Ok"]){
+                    const {Ok:{data, correlation_id}} = response;
+                    eventEmitter.emit(correlation_id, data);
+                }
+                else{
+                    console.error(response);
+                }
+
             };
 
         }

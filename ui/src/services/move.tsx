@@ -17,7 +17,6 @@ class MoveService extends BaseService{
 
     constructor( ws: WrappedWS) {
         super("move", ws);
-
     }
 }
 

@@ -5,16 +5,16 @@ use axum::{
     Router,
 };
 use dotenvy::dotenv;
-use sqlx::sqlite::{SqlitePoolOptions};
 use std::env;
 use axum::extract::State;
 use tokio::signal;
 use futures::stream::StreamExt;
-use crate::handlers::types::{WsResponse,WsMessage, AppState};
+use sea_orm::Database;
+use crate::handlers::types::{WsResponse, WsMessage, AppState};
+use migration::{Migrator, MigratorTrait};
 
-mod db;
 mod handlers;
-
+mod entities;
 
 async fn ws_handler(State(state): State<AppState>,ws: WebSocketUpgrade) -> impl IntoResponse {
     // `on_upgrade` invokes `handle_socket` once the handshake is done
@@ -62,20 +62,16 @@ async fn main() {
     // Get DATABASE_URL from environment
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
-    // Create the database connection pool
-    let db_pool = SqlitePoolOptions::new()
-        .max_connections(5)
-        .connect(&database_url)
-        .await
-        .expect("Failed to connect to the database");
 
+    let conn = Database::connect(&database_url)
+        .await
+        .expect("Database connection failed");
 
     // Bootstrap the database
-    db::bootstrap::bootstrap_db(&db_pool, &database_url)
-        .await
-        .expect("Failed to bootstrap the database");
+    Migrator::up(&conn, None).await.unwrap();
+
     // Build Axum state
-    let state = AppState { db_pool };
+    let state = AppState { conn };
 
     // Build the router with a route
     let app = Router::new()
