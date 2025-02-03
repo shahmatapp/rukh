@@ -37,6 +37,7 @@ next-env.d.ts
 api/target
 api/migration/target
 .idea
+.idea/rukh.iml
 .vscode
 ui/node_modules
 ui/.next
