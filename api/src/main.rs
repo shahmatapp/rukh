@@ -22,7 +22,7 @@ async fn ws_handler(State(state): State<AppState>,ws: WebSocketUpgrade) -> impl 
     ws.on_upgrade(move |socket| handle_socket(socket, state))
 }
 
-async fn process_request<'a>(msg: WsMessage, state: AppState) -> WsResponse {
+async fn process_request(msg: WsMessage, state: AppState) -> WsResponse {
     match msg.model.as_str() {
         "book" => handlers::books::process(msg.correlation_id, msg.action, msg.payload, state).await,
         "move" => handlers::moves::process(msg.correlation_id, msg.action, msg.payload, state).await,
