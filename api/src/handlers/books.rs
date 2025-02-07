@@ -1,17 +1,14 @@
-use sea_orm::ActiveValue::Set;
 use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait};
 use serde_json::{json, Value};
-use uuid::Uuid;
 use crate::handlers::types::{AppState, WsResponse};
 use crate::parse_or_error;
 use crate::entities::books as book;
 
 
 async fn create_book(conn: DatabaseConnection,correlation_id:String, payload: Value) -> WsResponse {
-    let input = parse_or_error!(payload, book::Model);
-    let mut active: book::ActiveModel = input.into();
-    active.id = Set(Uuid::new_v4().to_string());
-    match active.insert(&conn).await {
+    let input = parse_or_error!(payload, book::InsertModel);
+    let active: book::ActiveModel = input.to_active_model();
+    match book::Entity::insert(active).exec(&conn).await {
         Ok(_) => WsResponse::Ok {
             data: "done".into(),
             correlation_id
@@ -56,7 +53,7 @@ async fn update_book(conn: DatabaseConnection, correlation_id:String, payload: V
     let active_model: book::ActiveModel = book.into();
     match active_model.update(&conn).await {
         Ok(_) => WsResponse::Ok {
-            data: json!("Book updated successfully"),
+            data: json!("OK"),
             correlation_id
         },
         Err(_) => WsResponse::Error {

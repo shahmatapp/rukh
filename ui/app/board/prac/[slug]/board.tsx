@@ -20,12 +20,24 @@ export default function PracticeBoard(){
     const [childMoves, setChildMoves] = useState<Move[]>([]);
 
     useEffect(() => {
-        if(book){
-            moveService?.query({book_id :book.id, parent }).then((data)=>{
+        if(book && moveService){
+            moveService?.query({book_id :book.id, parent:parent?.id }).then((data)=>{
                 setChildMoves(data as Move[]);
+
             })
         }
-    }, [parent, book]);
+    }, [parent, book, moveService]);
+
+    useEffect(() => {
+        if (parent?.is_me && childMoves.length > 0) {
+            const timer = setTimeout(() => {
+                makeMove();
+            }, 1000);
+
+            // Clean up if component unmounts or if parent.is_me/childMoves changes
+            return () => clearTimeout(timer);
+        }
+    }, [childMoves, parent?.is_me]);
 
     const turnColor =()=>{
         return chess.turn() === "w" ? "white" : "black"
@@ -70,16 +82,8 @@ export default function PracticeBoard(){
 
     }
 
-    useEffect(() => {
-       if(parent?.is_me){
-        setTimeout(()=>{
-            makeMove();
-        },1000)
-       }
-    }, [parent]);
-
     let makeMove = ()=>{
-        if(childMoves){
+        if(childMoves.length>0){
             let random = Math.floor(Math.random() * childMoves.length );
             let move = childMoves[random];
             chess.move({from:move.mov[0],to:move.mov[1]});

@@ -1,5 +1,5 @@
 import {useContext} from "react";
-import {Move} from "@/src/services/move";
+import {Move, MovesContext} from "@/src/services/move";
 import PageContext from "@/app/board/edit/[slug]/context";
 import Button from '@mui/material/Button';
 import Announce from "@/app/components/ui/announce";
@@ -7,13 +7,19 @@ import Tiptap from "@/app/components/wysiwyg/wysiwyg";
 import {Card, CardActions, CardContent} from "@mui/material";
 export default function BoardState(){
     const {parentMove, apply, prepareEditor, book, turnColor, childMoves} = useContext(PageContext);
-
+    const {moveService} = useContext(MovesContext)
 
     let applyMove = (m:Move)=>{
         if (apply) {
             apply(m);
         }
     }
+
+    const updateNotes = async (data:string)=>{
+        parentMove!.notes = data;
+        await moveService?.save({id:parentMove!.id, notes:data});
+    }
+
     const myTurn = book.perspective === turnColor;
 
     return (
@@ -63,11 +69,7 @@ export default function BoardState(){
                         <div className={"mb-2"}>Add some notes
                             for {`${parentMove.mov[0]} → ${parentMove.mov[1]}`}</div>
                         <Tiptap
-                            onBlur={
-                                (data) => {
-                                    parentMove.notes = data;
-                                }
-                            }
+                            onBlur={updateNotes}
                             content={parentMove.notes}
                         />
                     </CardContent>

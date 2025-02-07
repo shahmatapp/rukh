@@ -21,7 +21,8 @@ impl MigrationTrait for Migration {
                     fen varchar NOT NULL,
                     is_me boolean NOT NULL,
                     parent varchar,
-                    mov TEXT Not null
+                    mov TEXT Not null,
+                    notes Text
                 );
                 "#,
             )

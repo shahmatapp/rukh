@@ -1,8 +1,7 @@
-use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
+use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, IntoActiveModel, QueryFilter};
 use sea_orm::ActiveValue::Set;
 use serde::Deserialize;
 use serde_json::{json, Value};
-use uuid::Uuid;
 use crate::handlers::types::{AppState, WsResponse};
 use crate::parse_or_error;
 use crate::entities::moves as mov;
@@ -11,6 +10,10 @@ use crate::entities::moves as mov;
 struct QueryMove{
     book_id: Option<String>,
     parent: Option<String>
+}
+#[derive(serde::Deserialize)]
+struct MoveId {
+    id: String,
 }
 async fn query(conn: DatabaseConnection, payload: Value, correlation_id:String) -> WsResponse {
     let input = parse_or_error!(payload, QueryMove);
@@ -42,19 +45,27 @@ async fn query(conn: DatabaseConnection, payload: Value, correlation_id:String) 
     }
 }
 
+async fn get_move(conn:DatabaseConnection, payload: Value, correlation_id:String)->WsResponse{
+    let input = parse_or_error!(payload, MoveId);
+    match mov::Entity::find_by_id(input.id).one(&conn).await{
+        Ok(mov) =>  WsResponse::Ok { data: json!(mov), correlation_id },
+        Err(_) => WsResponse::Error {
+            message: String::from("Could not find move"),
+        }
+    }
+}
+
 async fn create_move(conn:DatabaseConnection, payload: Value, correlation_id:String) ->WsResponse{
-    let input = parse_or_error!(payload, mov::Model);
-    let mut active :mov::ActiveModel = input.into();
-    active.id = Set(Uuid::new_v4().to_string());
+    let input = parse_or_error!(payload, mov::InsertModel);
+    let active :mov::ActiveModel = input.to_active_model();
 
-
-    match active.insert(&conn).await {
+    match mov::Entity::insert(active).exec(&conn).await {
         Ok(_) => WsResponse::Ok {
             data: "done".into(),
             correlation_id
         },
         Err(e) => {
-            println!("{}", e);
+            println!("insert error, {}", e);
             WsResponse::Error {
                 message: "Couldn't create move".into(),
             }
@@ -63,10 +74,32 @@ async fn create_move(conn:DatabaseConnection, payload: Value, correlation_id:Str
 
 }
 
+async fn update_move(conn:DatabaseConnection, payload: Value, correlation_id:String) -> WsResponse {
+    let input = parse_or_error!(payload, mov::UpdateModel);
+
+    let Ok(Some(mov)) = mov::Entity::find_by_id(&input.id).one(&conn).await else { 
+        return WsResponse::Error {
+            message : "Couldnt find move to upodate".into()
+        };
+    };
+    let mut active = mov.into_active_model();
+    active.notes = Set(Some(input.notes));
+    match active.update(&conn).await {
+        Ok(_) => WsResponse::Ok {
+            correlation_id,
+            data: json!("OK"),
+        },
+        Err(_) => WsResponse::Error { message:"couldnt update move".into()}
+    } 
+   
+}
+
 pub async fn process(correlation_id:String, action: String, payload: Value, state: AppState) -> WsResponse {
     match action.as_str() {
         "list" => query(state.conn.clone(), payload,correlation_id).await,
         "create" => create_move(state.conn.clone(), payload,correlation_id).await,
+        "get" => get_move(state.conn.clone(), payload, correlation_id).await,
+        "update" => update_move(state.conn.clone(), payload, correlation_id).await,
         &_ => WsResponse::Error {
             message: String::from("invalid action for book"),
         },
