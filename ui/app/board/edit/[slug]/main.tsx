@@ -46,7 +46,7 @@ export default function EditBoard() {
 
         }
 
-    }, [parent, moveService]);
+    }, [rootId, moveService]);
 
     useEffect(() => {
         if(moveService){

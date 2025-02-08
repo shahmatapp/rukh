@@ -19,8 +19,11 @@ export default function ConfirmMove({confirmMove}:Props){
 
     let save =()=>{
         let m:Move = {fen, mov, book_id, parent, is_me}
-        moveService?.save(m).then(_=>console.log("move saved"));
-        confirmMove(m);
+        moveService?.save(m).then((d)=>{
+            m.id = (d as Move).id
+            confirmMove(m);
+        });
+
     }
 
     return (

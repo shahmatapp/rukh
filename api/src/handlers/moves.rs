@@ -58,10 +58,10 @@ async fn get_move(conn:DatabaseConnection, payload: Value, correlation_id:String
 async fn create_move(conn:DatabaseConnection, payload: Value, correlation_id:String) ->WsResponse{
     let input = parse_or_error!(payload, mov::InsertModel);
     let active :mov::ActiveModel = input.to_active_model();
-
+    let new_id = active.clone().id.unwrap();
     match mov::Entity::insert(active).exec(&conn).await {
         Ok(_) => WsResponse::Ok {
-            data: "done".into(),
+            data: json!({"id": new_id}),
             correlation_id
         },
         Err(e) => {
